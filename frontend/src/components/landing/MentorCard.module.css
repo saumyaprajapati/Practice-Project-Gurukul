@@ -1,0 +1,58 @@
+.card {
+  transition:
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+
+/* Decorative illumination — border/shadow only, never reveals dialogue.
+   Gated behind (hover: hover) so touch taps don't leave a stuck glow. */
+@media (hover: hover) {
+  .card:hover {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--gold) 45%, transparent),
+      0 10px 30px -12px color-mix(in srgb, var(--gold) 55%, transparent);
+  }
+}
+
+/* Keyboard focus always shows the glow, regardless of hover capability. */
+.card:focus-within {
+  border-color: var(--gold);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--gold) 45%, transparent),
+    0 10px 30px -12px color-mix(in srgb, var(--gold) 55%, transparent);
+}
+
+/* Hide native disclosure triangle across engines. */
+.summary {
+  list-style: none;
+}
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Custom plus/minus indicator, rotates on open. */
+.indicator {
+  position: relative;
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.indicator::before,
+.indicator::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 2px;
+  background-color: var(--gold);
+  transform: translate(-50%, -50%);
+  transition: transform 200ms ease;
+}
+.indicator::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+.card[open] .indicator::after {
+  transform: translate(-50%, -50%) rotate(0deg);
+}

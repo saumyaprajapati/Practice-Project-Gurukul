@@ -2,11 +2,11 @@ import Navbar from "./Navbar";
 import Hero from "./Hero";
 import Problem from "./Problem";
 import PlatformNoticesYou from "./PlatformNoticesYou";
+import Mentors from "./Mentors";
 import Footer from "./Footer";
 import SectionPlaceholder from "./SectionPlaceholder";
 
 const SECTIONS = [
-  { id: "mentors", title: "Mentors", variant: "dark" },
   { id: "progress", title: "Progress", variant: "manuscript" },
   { id: "learning-experience", title: "Learning Experience", variant: "dark" },
   { id: "languages", title: "Languages", variant: "manuscript" },
@@ -24,6 +24,7 @@ export default function LandingPage() {
         <Hero />
         <Problem />
         <PlatformNoticesYou />
+        <Mentors />
         {SECTIONS.map(({ id, title, headingLevel, variant }) => (
           <SectionPlaceholder
             key={id}

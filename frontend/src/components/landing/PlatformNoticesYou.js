@@ -1,40 +1,21 @@
 import ScrollJourney from "./ScrollJourney";
+import { getMentor } from "./mentorsData";
+
+function toNote(mentor) {
+  return { mentor: mentor.name, message: mentor.dialogue };
+}
 
 const NOTICE_STEPS = [
-  {
-    id: "enrolled",
-    label: "Enrolled",
-    note: {
-      mentor: "Arjuna",
-      message: "Focus is a discipline, not a mood. Let's begin.",
-    },
-  },
+  { id: "enrolled", label: "Enrolled", note: toNote(getMentor("arjuna")) },
   { id: "watching", label: "Watching" },
   {
     id: "quiz-failed",
     label: "Quiz failed",
-    note: {
-      mentor: "Karna",
-      message: "A setback is not a verdict. Try again — I did.",
-    },
+    note: toNote(getMentor("karna")),
   },
   { id: "trying-again", label: "Trying again" },
-  {
-    id: "inactive",
-    label: "Inactive",
-    note: {
-      mentor: "Babur",
-      message: "Even an empire pauses. It doesn't have to end here.",
-    },
-  },
-  {
-    id: "returns",
-    label: "Returns",
-    note: {
-      mentor: "Ekalavya",
-      message: "You came back. That's the only skill that matters.",
-    },
-  },
+  { id: "inactive", label: "Inactive", note: toNote(getMentor("babur")) },
+  { id: "returns", label: "Returns", note: toNote(getMentor("ekalavya")) },
   { id: "completes", label: "Completes" },
 ];
 
