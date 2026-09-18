@@ -1,9 +1,9 @@
 import Navbar from "./Navbar";
+import Hero from "./Hero";
 import Footer from "./Footer";
 import SectionPlaceholder from "./SectionPlaceholder";
 
 const SECTIONS = [
-  { id: "hero", title: "Hero", headingLevel: 1, variant: "dark" },
   { id: "problem", title: "Problem", variant: "dark" },
   {
     id: "platform-notices-you",
@@ -25,6 +25,7 @@ export default function LandingPage() {
     <>
       <Navbar />
       <main id="main-content" className="flex-1">
+        <Hero />
         {SECTIONS.map(({ id, title, headingLevel, variant }) => (
           <SectionPlaceholder
             key={id}

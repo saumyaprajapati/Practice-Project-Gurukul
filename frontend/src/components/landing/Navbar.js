@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-// Single, obvious place to wire the final CTA target once a real
-// enrollment/auth route exists — no other file needs to change.
-const CTA_HREF = "#courses";
+import { ENTER_GURUKUL_HREF } from "./cta";
 
 const NAV_LINKS = [
   { label: "Courses", href: "#courses" },
@@ -45,7 +42,7 @@ export default function Navbar() {
           ))}
           <li>
             <a
-              href={CTA_HREF}
+              href={ENTER_GURUKUL_HREF}
               className="surface-earthy rounded px-4 py-2 font-medium"
             >
               Enter the Gurukul
@@ -91,7 +88,7 @@ export default function Navbar() {
           ))}
           <li>
             <a
-              href={CTA_HREF}
+              href={ENTER_GURUKUL_HREF}
               onClick={() => setIsOpen(false)}
               className="surface-earthy inline-block rounded px-4 py-2 font-medium"
             >
