@@ -1,41 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useScrollReveal } from "@/lib/useScrollReveal";
 import styles from "./CertificateSequence.module.css";
 
 export default function CertificateSequence() {
-  const wrapRef = useRef(null);
-  const [reducedMotion] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
-  const [revealed, setRevealed] = useState(reducedMotion);
-
-  useEffect(() => {
-    if (reducedMotion) return;
-
-    const el = wrapRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setRevealed(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.4 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [reducedMotion]);
+  const { ref, revealed } = useScrollReveal();
 
   return (
     <div>
       <div
-        ref={wrapRef}
+        ref={ref}
         className={`${styles.certificate} ${revealed ? styles.revealed : ""} surface-earthy relative mx-auto max-w-md rounded-lg p-8 text-center`}
       >
         <div className={styles.parchment}>
@@ -70,7 +44,7 @@ export default function CertificateSequence() {
         </div>
       </div>
 
-      <p className="mx-auto mt-6 max-w-md text-center text-xs text-charcoal/50">
+      <p className="mx-auto mt-6 max-w-md text-center text-xs text-charcoal/70">
         A preview of your completion certificate — not an official
         credential.
       </p>

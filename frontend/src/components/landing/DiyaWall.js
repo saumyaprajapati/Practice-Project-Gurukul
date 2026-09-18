@@ -1,40 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useScrollReveal } from "@/lib/useScrollReveal";
 import styles from "./DiyaWall.module.css";
 
 export default function DiyaWall({ milestones }) {
-  const wallRef = useRef(null);
-  const [reducedMotion] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
-  const [revealed, setRevealed] = useState(reducedMotion);
-
-  useEffect(() => {
-    if (reducedMotion) return;
-
-    const el = wallRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setRevealed(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.4 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [reducedMotion]);
+  const { ref, revealed, reducedMotion } = useScrollReveal();
 
   return (
     <div
-      ref={wallRef}
+      ref={ref}
       className={`${styles.wall} ${revealed ? styles.revealed : ""} relative overflow-hidden rounded-lg p-6 sm:p-8`}
     >
       <div className={`${styles.texture} absolute inset-0`} aria-hidden="true" />

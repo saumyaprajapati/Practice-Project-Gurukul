@@ -36,7 +36,7 @@ export default function LanguageSwitcher({ languages }) {
           key={active.code}
           className={`${styles.page} surface-earthy mt-6 max-w-sm rounded-lg p-6 text-center`}
         >
-          <p className="text-sm uppercase tracking-wide text-charcoal/60">
+          <p className="text-sm uppercase tracking-wide text-charcoal/70">
             {active.name}
           </p>
           <p className="mt-2 text-2xl text-charcoal">{active.greeting}</p>
