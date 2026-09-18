@@ -7,14 +7,10 @@ import Progress from "./Progress";
 import ProductExperience from "./ProductExperience";
 import Languages from "./Languages";
 import Courses from "./Courses";
+import Performance from "./Performance";
+import Completion from "./Completion";
+import FinalCTA from "./FinalCTA";
 import Footer from "./Footer";
-import SectionPlaceholder from "./SectionPlaceholder";
-
-const SECTIONS = [
-  { id: "performance", title: "Performance", variant: "manuscript" },
-  { id: "completion", title: "Completion", variant: "manuscript" },
-  { id: "final-cta", title: "Final CTA", variant: "manuscript" },
-];
 
 export default function LandingPage() {
   return (
@@ -29,15 +25,9 @@ export default function LandingPage() {
         <ProductExperience />
         <Languages />
         <Courses />
-        {SECTIONS.map(({ id, title, headingLevel, variant }) => (
-          <SectionPlaceholder
-            key={id}
-            id={id}
-            title={title}
-            headingLevel={headingLevel}
-            variant={variant}
-          />
-        ))}
+        <Performance />
+        <Completion />
+        <FinalCTA />
       </main>
       <Footer />
     </>
