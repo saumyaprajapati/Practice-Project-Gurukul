@@ -1,0 +1,9 @@
+.notesLines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 1.4rem,
+    color-mix(in srgb, var(--brown) 25%, transparent) 1.4rem,
+    color-mix(in srgb, var(--brown) 25%, transparent) calc(1.4rem + 1px)
+  );
+}

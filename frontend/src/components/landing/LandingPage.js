@@ -4,13 +4,13 @@ import Problem from "./Problem";
 import PlatformNoticesYou from "./PlatformNoticesYou";
 import Mentors from "./Mentors";
 import Progress from "./Progress";
+import ProductExperience from "./ProductExperience";
+import Languages from "./Languages";
+import Courses from "./Courses";
 import Footer from "./Footer";
 import SectionPlaceholder from "./SectionPlaceholder";
 
 const SECTIONS = [
-  { id: "learning-experience", title: "Learning Experience", variant: "dark" },
-  { id: "languages", title: "Languages", variant: "manuscript" },
-  { id: "courses", title: "Courses", variant: "dark" },
   { id: "performance", title: "Performance", variant: "manuscript" },
   { id: "completion", title: "Completion", variant: "manuscript" },
   { id: "final-cta", title: "Final CTA", variant: "manuscript" },
@@ -26,6 +26,9 @@ export default function LandingPage() {
         <PlatformNoticesYou />
         <Mentors />
         <Progress />
+        <ProductExperience />
+        <Languages />
+        <Courses />
         {SECTIONS.map(({ id, title, headingLevel, variant }) => (
           <SectionPlaceholder
             key={id}
