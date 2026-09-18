@@ -1,0 +1,29 @@
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.step {
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
+}
+
+.step:not(:first-child)::before {
+  content: "↓";
+  display: block;
+  color: var(--gold);
+  opacity: 0.8;
+  margin: 0.25rem 0;
+}
+
+.step[data-active="true"] {
+  transform: translateX(0.25rem) scale(1.02);
+  opacity: 1 !important;
+}
+
+.note {
+  border: 1px solid color-mix(in srgb, var(--brown) 30%, transparent);
+  background-color: color-mix(in srgb, var(--brown) 6%, transparent);
+}

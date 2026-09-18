@@ -1,0 +1,18 @@
+.stage {
+  perspective: 800px;
+}
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateX(12px) rotateY(-6deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.page {
+  animation: pageIn 400ms ease;
+}
