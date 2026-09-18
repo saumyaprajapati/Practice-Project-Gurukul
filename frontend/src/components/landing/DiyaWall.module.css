@@ -1,0 +1,30 @@
+.wall {
+  background-color: var(--charcoal);
+  transition: background-color 600ms ease;
+}
+.wall.revealed {
+  background-color: color-mix(in srgb, var(--charcoal) 85%, var(--brown) 15%);
+}
+
+.texture {
+  background-image:
+    radial-gradient(circle at 25% 30%, color-mix(in srgb, var(--gold) 5%, transparent) 0%, transparent 45%),
+    radial-gradient(circle at 75% 70%, color-mix(in srgb, var(--brown) 6%, transparent) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 800ms ease;
+  pointer-events: none;
+}
+.wall.revealed .texture {
+  opacity: 1;
+}
+
+.flamePath {
+  fill: color-mix(in srgb, var(--brown) 60%, var(--charcoal) 40%);
+  transition:
+    fill 400ms ease,
+    filter 400ms ease;
+}
+.wall.revealed .flamePath {
+  fill: var(--gold);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--gold) 70%, transparent));
+}
