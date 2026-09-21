@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import AuthCard from "@/components/auth/AuthCard";
 import AuthHeader from "@/components/auth/AuthHeader";
 import AuthInput from "@/components/auth/AuthInput";
 import AuthButton from "@/components/auth/AuthButton";
+import AuthFooterNav from "@/components/auth/AuthFooterNav";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { setAuthHandoff } from "@/lib/auth/handoff";
 
@@ -40,6 +42,14 @@ export default function RecoveryPage() {
           Send Code
         </AuthButton>
       </form>
+      <AuthFooterNav>
+        <p>
+          Remembered your password?{" "}
+          <Link href={AUTH_ROUTES.login} className="text-ochre underline underline-offset-4">
+            Log in
+          </Link>
+        </p>
+      </AuthFooterNav>
     </AuthCard>
   );
 }

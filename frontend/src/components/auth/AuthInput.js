@@ -9,6 +9,8 @@ export default function AuthInput({
   autoComplete,
   error,
   hint,
+  disabled = false,
+  inputMode,
 }) {
   const describedBy = [error && `${id}-error`, hint && `${id}-hint`]
     .filter(Boolean)
@@ -27,9 +29,11 @@ export default function AuthInput({
         onChange={onChange}
         required={required}
         autoComplete={autoComplete}
+        disabled={disabled}
+        inputMode={inputMode}
         aria-invalid={Boolean(error)}
         aria-describedby={describedBy || undefined}
-        className="w-full rounded border border-brown/40 bg-cream px-3 py-2 text-charcoal outline-none focus-visible:outline-2 focus-visible:outline-offset-2"
+        className="w-full rounded border border-brown/40 bg-cream px-3 py-2 text-charcoal outline-none focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
       />
       {hint ? (
         <p id={`${id}-hint`} className="mt-1 text-sm text-charcoal/70">

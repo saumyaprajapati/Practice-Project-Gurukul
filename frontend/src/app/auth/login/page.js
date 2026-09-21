@@ -7,6 +7,7 @@ import AuthCard from "@/components/auth/AuthCard";
 import AuthHeader from "@/components/auth/AuthHeader";
 import AuthInput from "@/components/auth/AuthInput";
 import AuthButton from "@/components/auth/AuthButton";
+import AuthFooterNav from "@/components/auth/AuthFooterNav";
 import Captcha from "@/components/auth/Captcha";
 import HoneypotField from "@/components/auth/HoneypotField";
 import { AUTH_ROUTES, getPostAuthDestination } from "@/lib/auth/routes";
@@ -68,17 +69,19 @@ export default function LoginPage() {
           Log In
         </AuthButton>
       </form>
-      <p className="mt-4 text-sm">
-        <Link href={AUTH_ROUTES.recovery} className="text-ochre underline underline-offset-4">
-          Forgot password?
-        </Link>
-      </p>
-      <p className="mt-2 text-sm text-charcoal/80">
-        New here?{" "}
-        <Link href={AUTH_ROUTES.signup} className="text-ochre underline underline-offset-4">
-          Sign up
-        </Link>
-      </p>
+      <AuthFooterNav>
+        <p>
+          <Link href={AUTH_ROUTES.recovery} className="text-ochre underline underline-offset-4">
+            Forgot password?
+          </Link>
+        </p>
+        <p>
+          New here?{" "}
+          <Link href={AUTH_ROUTES.signup} className="text-ochre underline underline-offset-4">
+            Sign up
+          </Link>
+        </p>
+      </AuthFooterNav>
     </AuthCard>
   );
 }

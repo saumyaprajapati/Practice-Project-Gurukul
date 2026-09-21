@@ -7,6 +7,7 @@ import AuthCard from "@/components/auth/AuthCard";
 import AuthHeader from "@/components/auth/AuthHeader";
 import AuthInput from "@/components/auth/AuthInput";
 import AuthButton from "@/components/auth/AuthButton";
+import AuthFooterNav from "@/components/auth/AuthFooterNav";
 import HoneypotField from "@/components/auth/HoneypotField";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { setAuthHandoff } from "@/lib/auth/handoff";
@@ -72,12 +73,14 @@ export default function SignupPage() {
           Sign Up
         </AuthButton>
       </form>
-      <p className="mt-6 text-sm text-charcoal/80">
-        Already have an account?{" "}
-        <Link href={AUTH_ROUTES.login} className="text-ochre underline underline-offset-4">
-          Log in
-        </Link>
-      </p>
+      <AuthFooterNav>
+        <p>
+          Already have an account?{" "}
+          <Link href={AUTH_ROUTES.login} className="text-ochre underline underline-offset-4">
+            Log in
+          </Link>
+        </p>
+      </AuthFooterNav>
     </AuthCard>
   );
 }
