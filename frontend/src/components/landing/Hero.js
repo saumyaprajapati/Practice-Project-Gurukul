@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "./Hero.module.css";
 import { ENTER_GURUKUL_HREF, EXPLORE_COURSES_HREF } from "./cta";
 
@@ -94,12 +95,12 @@ export default function Hero() {
           <div
             className={`mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row md:justify-start ${styles.heroAnim} ${styles.ctas}`}
           >
-            <a
+            <Link
               href={ENTER_GURUKUL_HREF}
               className="surface-earthy rounded px-6 py-3 font-medium"
             >
               Enter the Gurukul
-            </a>
+            </Link>
             <a
               href={EXPLORE_COURSES_HREF}
               className="font-medium text-cream/85 underline underline-offset-4 hover:text-gold"

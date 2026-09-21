@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ENTER_GURUKUL_HREF } from "./cta";
 import styles from "./Footer.module.css";
 
@@ -24,9 +25,9 @@ function FooterNavColumn({ title, links }) {
       <ul className="mt-4 space-y-2">
         {links.map((link) => (
           <li key={link.href}>
-            <a href={link.href} className="text-sm text-cream/80 hover:text-cream">
+            <Link href={link.href} className="text-sm text-cream/80 hover:text-cream">
               {link.label}
-            </a>
+            </Link>
           </li>
         ))}
       </ul>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { ENTER_GURUKUL_HREF } from "./cta";
 
 const NAV_LINKS = [
@@ -41,12 +42,12 @@ export default function Navbar() {
             </li>
           ))}
           <li>
-            <a
+            <Link
               href={ENTER_GURUKUL_HREF}
               className="surface-earthy rounded px-4 py-2 font-medium"
             >
               Enter the Gurukul
-            </a>
+            </Link>
           </li>
         </ul>
 
@@ -87,13 +88,13 @@ export default function Navbar() {
             </li>
           ))}
           <li>
-            <a
+            <Link
               href={ENTER_GURUKUL_HREF}
               onClick={() => setIsOpen(false)}
               className="surface-earthy inline-block rounded px-4 py-2 font-medium"
             >
               Enter the Gurukul
-            </a>
+            </Link>
           </li>
         </ul>
       </div>

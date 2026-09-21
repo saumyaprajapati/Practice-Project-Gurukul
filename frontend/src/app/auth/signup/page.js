@@ -118,7 +118,7 @@ export default function SignupPage() {
       </form>
       <AuthFooterNav>
         <p>
-          Already have an account?{" "}
+          Already Have An Account?{" "}
           <Link href={AUTH_ROUTES.login} className="text-ochre underline underline-offset-4">
             Log in
           </Link>
