@@ -13,9 +13,12 @@ import HoneypotField from "@/components/auth/HoneypotField";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { setAuthHandoff } from "@/lib/auth/handoff";
 import { validateEmail, validatePassword, validatePasswordsMatch } from "@/lib/auth/validation";
-import { isHoneypotTripped, triggerHoneypotLockout, isHoneypotLocked } from "@/lib/auth/honeypot";
-
-const BLOCKED_MESSAGE = "Something went wrong. Please try again in a few minutes.";
+import {
+  isHoneypotTripped,
+  triggerHoneypotLockout,
+  isHoneypotLocked,
+  HONEYPOT_BLOCKED_MESSAGE,
+} from "@/lib/auth/honeypot";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -33,12 +36,12 @@ export default function SignupPage() {
     event.preventDefault();
 
     if (isHoneypotLocked()) {
-      setFormError(BLOCKED_MESSAGE);
+      setFormError(HONEYPOT_BLOCKED_MESSAGE);
       return;
     }
     if (isHoneypotTripped(honeypot)) {
       triggerHoneypotLockout();
-      setFormError(BLOCKED_MESSAGE);
+      setFormError(HONEYPOT_BLOCKED_MESSAGE);
       return;
     }
 

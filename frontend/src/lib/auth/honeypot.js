@@ -6,6 +6,11 @@
 const LOCKOUT_KEY = "gurukul.auth.honeypotLockUntil";
 const LOCKOUT_DURATION_MS = 5 * 60 * 1000;
 
+// Shared, deliberately generic copy for any auth form blocked by the
+// honeypot — never reveals that a bot trap exists.
+export const HONEYPOT_BLOCKED_MESSAGE =
+  "Something went wrong. Please try again in a few minutes.";
+
 export function isHoneypotTripped(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
