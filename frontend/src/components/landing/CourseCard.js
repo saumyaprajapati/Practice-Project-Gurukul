@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ENTER_GURUKUL_HREF } from "./cta";
 
 export default function CourseCard({ course }) {
@@ -25,12 +26,12 @@ export default function CourseCard({ course }) {
         {lessons} Lessons · {level}
       </p>
 
-      <a
+      <Link
         href={ENTER_GURUKUL_HREF}
         className="surface-earthy mt-4 block rounded px-4 py-2 text-center text-sm font-medium"
       >
         View Course
-      </a>
+      </Link>
     </div>
   );
 }
