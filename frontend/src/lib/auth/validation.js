@@ -18,7 +18,9 @@ export function validatePassword(value) {
 }
 
 export function validatePasswordsMatch(password, confirmPassword) {
-  return password === confirmPassword ? null : "Passwords do not match.";
+  return password === confirmPassword
+    ? null
+    : "password and confirm password doesn't match each other";
 }
 
 export function validateCode(value) {
