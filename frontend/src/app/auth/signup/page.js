@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AuthCard from "@/components/auth/AuthCard";
@@ -10,7 +10,7 @@ import AuthButton from "@/components/auth/AuthButton";
 import AuthError from "@/components/auth/AuthError";
 import AuthFooterNav from "@/components/auth/AuthFooterNav";
 import HoneypotField from "@/components/auth/HoneypotField";
-import { AUTH_ROUTES } from "@/lib/auth/routes";
+import { AUTH_ROUTES, getPostAuthDestination } from "@/lib/auth/routes";
 import { setAuthHandoff } from "@/lib/auth/handoff";
 import { validateEmail, validatePassword, validatePasswordsMatch } from "@/lib/auth/validation";
 import {
@@ -19,6 +19,7 @@ import {
   isHoneypotLocked,
   HONEYPOT_BLOCKED_MESSAGE,
 } from "@/lib/auth/honeypot";
+import { isAuthenticated } from "@/lib/auth/session";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -31,6 +32,12 @@ export default function SignupPage() {
   const [formError, setFormError] = useState(null);
 
   const canSubmit = email.trim().length > 0 && password.length > 0;
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      router.replace(getPostAuthDestination());
+    }
+  }, [router]);
 
   function handleSubmit(event) {
     event.preventDefault();

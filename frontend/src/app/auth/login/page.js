@@ -20,6 +20,7 @@ import {
   isHoneypotLocked,
   HONEYPOT_BLOCKED_MESSAGE,
 } from "@/lib/auth/honeypot";
+import { isAuthenticated, setAuthenticated } from "@/lib/auth/session";
 
 const CAPTCHA_MISMATCH_MESSAGE = "That doesn't match the image. Try again.";
 
@@ -41,6 +42,12 @@ export default function LoginPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- the challenge must be generated client-only, post-mount, to avoid a hydration mismatch.
     setChallenge(generateChallenge());
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      router.replace(getPostAuthDestination());
+    }
+  }, [router]);
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -73,6 +80,7 @@ export default function LoginPage() {
 
     setErrors({ email: null, password: null, captcha: null });
     setFormError(null);
+    setAuthenticated();
     router.push(getPostAuthDestination());
   }
 

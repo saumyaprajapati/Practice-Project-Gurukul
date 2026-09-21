@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import Hero from "./Hero";
 import Problem from "./Problem";
@@ -11,13 +14,26 @@ import Performance from "./Performance";
 import Completion from "./Completion";
 import FinalCTA from "./FinalCTA";
 import Footer from "./Footer";
+import { isAuthenticated, clearAuthenticated } from "@/lib/auth/session";
 
 export default function LandingPage() {
+  const [isAuthed, setIsAuthed] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage can't be read during SSR; this must run post-mount to avoid a hydration mismatch.
+    setIsAuthed(isAuthenticated());
+  }, []);
+
+  function handleSignOut() {
+    clearAuthenticated();
+    setIsAuthed(false);
+  }
+
   return (
     <>
-      <Navbar />
+      <Navbar isAuthed={isAuthed} onSignOut={handleSignOut} />
       <main id="main-content" className="flex-1">
-        <Hero />
+        <Hero isAuthed={isAuthed} />
         <Problem />
         <PlatformNoticesYou />
         <Mentors />
@@ -27,7 +43,7 @@ export default function LandingPage() {
         <Courses />
         <Performance />
         <Completion />
-        <FinalCTA />
+        <FinalCTA isAuthed={isAuthed} />
       </main>
       <Footer />
     </>

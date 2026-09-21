@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ENTER_GURUKUL_HREF } from "./cta";
 
-export default function FinalCTA() {
+export default function FinalCTA({ isAuthed }) {
   return (
     <section
       id="final-cta"
@@ -16,12 +16,14 @@ export default function FinalCTA() {
 
         <p className="mt-6 text-charcoal/80">The path starts with one lesson.</p>
 
-        <Link
-          href={ENTER_GURUKUL_HREF}
-          className="surface-earthy mt-8 inline-block rounded px-8 py-4 text-lg font-semibold"
-        >
-          Enter the Gurukul
-        </Link>
+        {isAuthed ? null : (
+          <Link
+            href={ENTER_GURUKUL_HREF}
+            className="surface-earthy mt-8 inline-block rounded px-8 py-4 text-lg font-semibold"
+          >
+            Enter the Gurukul
+          </Link>
+        )}
       </div>
     </section>
   );
