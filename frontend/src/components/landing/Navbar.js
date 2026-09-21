@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ENTER_GURUKUL_HREF } from "./cta";
+import { ENTER_GURUKUL_HREF, PROFILE_HREF } from "./cta";
+import ProfileIcon from "./ProfileIcon";
+import ProfileMenu from "./ProfileMenu";
 
 const NAV_LINKS = [
   { label: "Courses", href: "#courses" },
@@ -11,7 +13,7 @@ const NAV_LINKS = [
   { label: "About", href: "#problem" },
 ];
 
-export default function Navbar() {
+export default function Navbar({ isAuthed, onSignOut }) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -41,14 +43,20 @@ export default function Navbar() {
               <a href={link.href}>{link.label}</a>
             </li>
           ))}
-          <li>
-            <Link
-              href={ENTER_GURUKUL_HREF}
-              className="surface-earthy rounded px-4 py-2 font-medium"
-            >
-              Enter the Gurukul
-            </Link>
-          </li>
+          {isAuthed ? (
+            <li>
+              <ProfileMenu onSignOut={onSignOut} />
+            </li>
+          ) : (
+            <li>
+              <Link
+                href={ENTER_GURUKUL_HREF}
+                className="surface-earthy rounded px-4 py-2 font-medium"
+              >
+                Enter the Gurukul
+              </Link>
+            </li>
+          )}
         </ul>
 
         <button
@@ -87,15 +95,42 @@ export default function Navbar() {
               </a>
             </li>
           ))}
-          <li>
-            <Link
-              href={ENTER_GURUKUL_HREF}
-              onClick={() => setIsOpen(false)}
-              className="surface-earthy inline-block rounded px-4 py-2 font-medium"
-            >
-              Enter the Gurukul
-            </Link>
-          </li>
+          {isAuthed ? (
+            <>
+              <li>
+                <Link
+                  href={PROFILE_HREF}
+                  onClick={() => setIsOpen(false)}
+                  className="inline-flex items-center gap-2"
+                >
+                  <ProfileIcon />
+                  View Profile
+                </Link>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false);
+                    onSignOut();
+                  }}
+                  className="text-left"
+                >
+                  Sign Out
+                </button>
+              </li>
+            </>
+          ) : (
+            <li>
+              <Link
+                href={ENTER_GURUKUL_HREF}
+                onClick={() => setIsOpen(false)}
+                className="surface-earthy inline-block rounded px-4 py-2 font-medium"
+              >
+                Enter the Gurukul
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
     </header>

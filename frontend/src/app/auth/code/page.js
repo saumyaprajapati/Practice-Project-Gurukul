@@ -13,6 +13,7 @@ import { AUTH_ROUTES, getPostAuthDestination } from "@/lib/auth/routes";
 import { getAuthHandoff, clearAuthHandoff } from "@/lib/auth/handoff";
 import { issueVerificationCode, verifyCode, clearVerificationCode, INCORRECT_CODE_MESSAGE } from "@/lib/auth/code";
 import { maskEmail } from "@/lib/auth/email";
+import { setAuthenticated } from "@/lib/auth/session";
 
 export default function CodePage() {
   const router = useRouter();
@@ -34,6 +35,7 @@ export default function CodePage() {
     if (verifyCode(code)) {
       clearVerificationCode();
       clearAuthHandoff();
+      setAuthenticated();
       router.push(getPostAuthDestination());
     } else {
       setError(INCORRECT_CODE_MESSAGE);
