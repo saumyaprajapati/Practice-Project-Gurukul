@@ -1,13 +1,11 @@
 // Extends the chaitya-arch/surface-earthy pattern already established by
 // components/landing/CourseCard.js, for the Buy Courses catalogue's actual
-// data shape (price, description, expired-access state). Payment and a
-// course-detail flow aren't implemented yet (Dashboard-1 scope), so the CTA
-// is a clearly-inert placeholder rather than a dead link.
-const currencyFormatter = new Intl.NumberFormat("en-IN", {
-  style: "currency",
-  currency: "INR",
-  maximumFractionDigits: 0,
-});
+// data shape (price, description, expired-access state). The CTA navigates
+// to the Course Detail page, which owns the still-inert purchase/renewal
+// action — no payment backend exists yet.
+import Link from "next/link";
+import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
+import { formatPrice } from "@/lib/courses/currency";
 
 export default function BuyCourseCard({ course, enrollment }) {
   const { title, description, category, instructor, image, price } = course;
@@ -41,18 +39,15 @@ export default function BuyCourseCard({ course, enrollment }) {
       ) : null}
 
       <p className="mt-3 text-center font-semibold text-charcoal">
-        {currencyFormatter.format(price)}
+        {formatPrice(price)}
       </p>
 
-      <button
-        type="button"
-        disabled
-        aria-disabled="true"
-        title="Course purchase isn't available yet."
-        className="surface-earthy mt-4 block rounded px-4 py-2 text-center text-sm font-medium opacity-60"
+      <Link
+        href={GURUKUL_ROUTES.courseDetail(course.id)}
+        className="surface-earthy mt-4 block rounded px-4 py-2 text-center text-sm font-medium"
       >
         {isExpired ? "Renew Access" : "View Course"}
-      </button>
+      </Link>
     </li>
   );
 }

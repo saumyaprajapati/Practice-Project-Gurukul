@@ -18,12 +18,24 @@ export function getCurrentUserId() {
   return MOCK_USER_ID;
 }
 
-export function getEnrollmentForCourse(courseId, userId = getCurrentUserId()) {
-  return ENROLLMENTS.find((e) => e.courseId === courseId && e.userId === userId) ?? null;
+// `overrides` (from lib/courses/enrollmentStore.js) layers a mock purchase
+// or progress update on top of the static ENROLLMENTS baseline — this file
+// stays pure and never touches localStorage itself. `overrides` comes
+// before `userId` since every real call site needs to pass overrides but
+// never a non-default userId (only one mock user exists in this prototype).
+export function getEnrollmentForCourse(courseId, overrides = {}, userId = getCurrentUserId()) {
+  const base = ENROLLMENTS.find((e) => e.courseId === courseId && e.userId === userId) ?? null;
+  const override = overrides[courseId];
+  if (!override) return base;
+  return { courseId, userId, ...(base ?? {}), ...override };
 }
 
-export function getEnrollmentsForUser(userId = getCurrentUserId()) {
-  return ENROLLMENTS.filter((e) => e.userId === userId);
+export function getEnrollmentsForUser(overrides = {}, userId = getCurrentUserId()) {
+  const courseIds = new Set([
+    ...ENROLLMENTS.filter((e) => e.userId === userId).map((e) => e.courseId),
+    ...Object.keys(overrides),
+  ]);
+  return [...courseIds].map((courseId) => getEnrollmentForCourse(courseId, overrides, userId));
 }
 
 export function hasActiveAccess(enrollment) {

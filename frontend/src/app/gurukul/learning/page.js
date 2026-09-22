@@ -4,13 +4,15 @@ import Link from "next/link";
 import CourseListing from "@/components/gurukul/CourseListing";
 import MyLearningCourseCard from "@/components/gurukul/MyLearningCourseCard";
 import { getMyLearningCourses } from "@/lib/courses/derive";
+import { useOverrides } from "@/lib/courses/enrollmentStore";
 import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 
 // Courses the learner currently has active access to. Search only shows up
 // past 16 owned courses (Dashboard-2 §"Course search") — with the mock
 // data seeded here that stays correctly hidden, not missing.
 export default function MyLearningPage() {
-  const items = getMyLearningCourses();
+  const { overrides } = useOverrides();
+  const items = getMyLearningCourses(overrides);
 
   return (
     <section className="section-manuscript flex-1">
