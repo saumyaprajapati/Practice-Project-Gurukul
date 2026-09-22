@@ -28,7 +28,19 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${anekLatin.variable} ${tiroDevanagariSanskrit.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {/* Shared chaitya-arch clip shape, used by every course card
+            (landing page + Learning Hub) via clipPath: url(#chaitya-arch).
+            Defined once, globally, so no page needs its own copy. */}
+        <svg width="0" height="0" aria-hidden="true">
+          <defs>
+            <clipPath id="chaitya-arch" clipPathUnits="objectBoundingBox">
+              <path d="M 0.1 1 L 0.1 0.55 C 0.1 0.15 0.25 0 0.5 0 C 0.75 0 0.9 0.15 0.9 0.55 L 0.9 1 Z" />
+            </clipPath>
+          </defs>
+        </svg>
+        {children}
+      </body>
     </html>
   );
 }
