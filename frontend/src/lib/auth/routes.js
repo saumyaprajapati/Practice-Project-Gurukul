@@ -1,3 +1,5 @@
+import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
+
 // Single source of truth for auth route paths and the post-auth destination.
 export const AUTH_ROUTES = {
   signup: "/auth/signup",
@@ -6,9 +8,8 @@ export const AUTH_ROUTES = {
   code: "/auth/code",
 };
 
-// No real dashboard exists yet — change only this line to redirect to
-// "/dashboard" once one does.
-const POST_AUTH_DESTINATION = "/";
+// The Learning Hub now exists — sign-in/sign-up lands there.
+const POST_AUTH_DESTINATION = GURUKUL_ROUTES.home;
 
 export function getPostAuthDestination() {
   return POST_AUTH_DESTINATION;
