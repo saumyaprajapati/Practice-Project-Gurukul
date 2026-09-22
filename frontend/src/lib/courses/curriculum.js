@@ -88,12 +88,9 @@ export function flattenLessons(curriculum) {
   return flat;
 }
 
-// Seeds session-only completed-lesson state from the enrollment's static
-// mock progress percentage — an approximation (percentage vs lesson count
-// don't divide evenly) accepted as-is for a mock dataset.
-export function computeInitialCompletedLessonIds(flatLessons, progress) {
-  const total = flatLessons.length;
-  if (total === 0) return [];
-  const completedCount = Math.round((progress / 100) * total);
-  return flatLessons.slice(0, completedCount).map((lesson) => lesson.lessonId);
+// Every course shares the same MODULE_ARCHETYPES structure, so the total
+// lesson count needs no course argument. Used server-side (api/enrollments/
+// [courseId]/progress) to turn a completed-lesson count into a percent.
+export function getTotalLessonCount() {
+  return MODULE_ARCHETYPES.reduce((sum, module) => sum + module.lessons.length, 0);
 }

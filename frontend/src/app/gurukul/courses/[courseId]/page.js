@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from "react";
 import { getCourseById } from "@/lib/courses/courses";
 import { getEnrollmentForCourse, hasActiveAccess } from "@/lib/courses/enrollment";
+import { getLessonProgress } from "@/lib/courses/progress";
 import { getCurriculumForCourse } from "@/lib/courses/curriculum";
 import CourseHero from "@/components/gurukul/course-detail/CourseHero";
 import CourseOverview from "@/components/gurukul/course-detail/CourseOverview";
@@ -22,11 +23,13 @@ export default function CourseDetailPage({ params }) {
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([getCourseById(courseId), getEnrollmentForCourse(courseId)]).then(
-      ([course, enrollment]) => {
-        if (!cancelled) setData({ course, enrollment });
-      }
-    );
+    Promise.all([
+      getCourseById(courseId),
+      getEnrollmentForCourse(courseId),
+      getLessonProgress(courseId),
+    ]).then(([course, enrollment, completedLessonIds]) => {
+      if (!cancelled) setData({ course, enrollment, completedLessonIds });
+    });
     return () => {
       cancelled = true;
     };
@@ -34,7 +37,7 @@ export default function CourseDetailPage({ params }) {
 
   if (!data) return null;
 
-  const { course, enrollment } = data;
+  const { course, enrollment, completedLessonIds } = data;
   const curriculum = getCurriculumForCourse(course);
   const hasAccess = hasActiveAccess(enrollment);
   const isExpired = enrollment?.status === "expired";
@@ -45,7 +48,10 @@ export default function CourseDetailPage({ params }) {
         <CourseHero course={course} />
 
         {hasAccess ? (
-          <CourseLearningExperience curriculum={curriculum} initialProgress={enrollment.progress} />
+          <CourseLearningExperience
+            curriculum={curriculum}
+            initialCompletedLessonIds={completedLessonIds}
+          />
         ) : (
           <CourseOverview
             course={course}

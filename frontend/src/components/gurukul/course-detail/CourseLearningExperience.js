@@ -1,27 +1,26 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import SyllabusNav from "./SyllabusNav";
 import LessonPanel from "./LessonPanel";
 import ProgressCard from "./ProgressCard";
-import { flattenLessons, computeInitialCompletedLessonIds } from "@/lib/courses/curriculum";
-import { setCourseProgress } from "@/lib/courses/enrollmentStore";
+import { flattenLessons } from "@/lib/courses/curriculum";
+import { markLessonComplete } from "@/lib/courses/progress";
 
 // Enrolled branch. Owns the only interactive/stateful part of the Course
-// Detail page: current lesson + completed-lesson set. completedLessonIds
-// is local React state, but every change is persisted via
-// setCourseProgress (localStorage-backed), so /gurukul/learning's progress
-// bar reflects it on next mount/read.
-export default function CourseLearningExperience({ curriculum, initialProgress }) {
+// Detail page: current lesson + completed-lesson set. initialCompletedLessonIds
+// comes from the real lesson_progress table (api/enrollments/[courseId]/
+// progress), so it's exact, not an approximation. Every "Mark Complete"
+// click POSTs to the same route, which recomputes and persists the
+// enrollment's progress_percent — /gurukul/learning reads that on next load.
+export default function CourseLearningExperience({ curriculum, initialCompletedLessonIds }) {
   const flatLessons = useMemo(() => flattenLessons(curriculum), [curriculum]);
-  const initialCompletedIds = useMemo(
-    () => computeInitialCompletedLessonIds(flatLessons, initialProgress),
-    [flatLessons, initialProgress]
-  );
 
-  const [completedLessonIds, setCompletedLessonIds] = useState(() => new Set(initialCompletedIds));
+  const [completedLessonIds, setCompletedLessonIds] = useState(() => new Set(initialCompletedLessonIds));
   const [currentLessonId, setCurrentLessonId] = useState(() => {
-    const firstIncomplete = flatLessons.find((lesson) => !initialCompletedIds.includes(lesson.lessonId));
+    const firstIncomplete = flatLessons.find(
+      (lesson) => !initialCompletedLessonIds.includes(lesson.lessonId)
+    );
     return (firstIncomplete ?? flatLessons[flatLessons.length - 1])?.lessonId ?? null;
   });
 
@@ -32,12 +31,12 @@ export default function CourseLearningExperience({ curriculum, initialProgress }
   const completedCount = completedLessonIds.size;
   const percent = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
 
-  useEffect(() => {
-    setCourseProgress(curriculum.courseId, percent);
-  }, [curriculum.courseId, percent]);
-
-  function handleMarkComplete() {
-    setCompletedLessonIds((prev) => new Set(prev).add(currentLesson.lessonId));
+  async function handleMarkComplete() {
+    const { completedLessonIds: updated } = await markLessonComplete(
+      curriculum.courseId,
+      currentLesson.lessonId
+    );
+    setCompletedLessonIds(new Set(updated));
   }
 
   function handleSelectLesson(lessonId) {
