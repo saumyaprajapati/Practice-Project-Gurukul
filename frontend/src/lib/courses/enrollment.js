@@ -1,41 +1,18 @@
-// Mock Enrollment repository — deliberately separate from the Course
-// repository (lib/courses/courses.js). Enrollment is per-user access state
-// (purchasedAt/expiresAt/status/progress), never a permanent property of a
-// course. Only "mock-user" exists for this prototype phase; a real backend
-// would key this off the authenticated user's id.
-const MOCK_USER_ID = "mock-user";
+// Enrollment repository — talks to the real /api/enrollments routes,
+// scoped server-side to the authenticated user (see lib/server/auth.js).
+// hasActiveAccess/getCourseState stay pure and unchanged: they only ever
+// derive from the enrollment shape returned by the API, which mirrors the
+// old mock ENROLLMENTS objects field-for-field on purpose.
+import { apiFetch } from "@/lib/apiClient";
 
-export const ENROLLMENTS = [
-  { courseId: "python-foundations", userId: MOCK_USER_ID, purchasedAt: "2026-06-01", expiresAt: "2027-06-01", status: "active", progress: 40 },
-  { courseId: "react-in-depth", userId: MOCK_USER_ID, purchasedAt: "2026-08-01", expiresAt: "2027-08-01", status: "active", progress: 10 },
-  { courseId: "linux-command-line", userId: MOCK_USER_ID, purchasedAt: "2026-09-01", expiresAt: "2027-09-01", status: "active", progress: 0 },
-  { courseId: "data-visualization", userId: MOCK_USER_ID, purchasedAt: "2026-02-01", expiresAt: "2027-02-01", status: "active", progress: 100 },
-  { courseId: "sql-for-everyone", userId: MOCK_USER_ID, purchasedAt: "2025-01-01", expiresAt: "2026-01-01", status: "expired", progress: 65 },
-  { courseId: "git-and-github", userId: MOCK_USER_ID, purchasedAt: "2025-03-01", expiresAt: "2026-03-01", status: "expired", progress: 20 },
-];
-
-export function getCurrentUserId() {
-  return MOCK_USER_ID;
+export async function getEnrollmentForCourse(courseId) {
+  const { enrollment } = await apiFetch(`/api/enrollments/${courseId}`);
+  return enrollment;
 }
 
-// `overrides` (from lib/courses/enrollmentStore.js) layers a mock purchase
-// or progress update on top of the static ENROLLMENTS baseline — this file
-// stays pure and never touches localStorage itself. `overrides` comes
-// before `userId` since every real call site needs to pass overrides but
-// never a non-default userId (only one mock user exists in this prototype).
-export function getEnrollmentForCourse(courseId, overrides = {}, userId = getCurrentUserId()) {
-  const base = ENROLLMENTS.find((e) => e.courseId === courseId && e.userId === userId) ?? null;
-  const override = overrides[courseId];
-  if (!override) return base;
-  return { courseId, userId, ...(base ?? {}), ...override };
-}
-
-export function getEnrollmentsForUser(overrides = {}, userId = getCurrentUserId()) {
-  const courseIds = new Set([
-    ...ENROLLMENTS.filter((e) => e.userId === userId).map((e) => e.courseId),
-    ...Object.keys(overrides),
-  ]);
-  return [...courseIds].map((courseId) => getEnrollmentForCourse(courseId, overrides, userId));
+export async function getEnrollmentsForUser() {
+  const { enrollments } = await apiFetch("/api/enrollments");
+  return enrollments;
 }
 
 export function hasActiveAccess(enrollment) {

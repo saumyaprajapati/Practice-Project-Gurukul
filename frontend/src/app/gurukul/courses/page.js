@@ -1,9 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import CourseListing from "@/components/gurukul/CourseListing";
 import BuyCourseCard from "@/components/gurukul/BuyCourseCard";
-import { getPurchasableCourses } from "@/lib/courses/derive";
-import { useOverrides } from "@/lib/courses/enrollmentStore";
+import { apiFetch } from "@/lib/apiClient";
 
 // Courses the learner can purchase: never-owned courses and courses whose
 // access has expired. Actively-owned courses are excluded — they belong in
@@ -15,8 +15,19 @@ import { useOverrides } from "@/lib/courses/enrollmentStore";
 // make) because CourseListing owns interactive query/page state and Next.js
 // won't let a Server Component pass a render-function prop into it.
 export default function BuyCoursesPage() {
-  const { overrides } = useOverrides();
-  const purchasable = getPurchasableCourses(overrides);
+  const [items, setItems] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    apiFetch("/api/courses/purchasable").then(({ items }) => {
+      if (!cancelled) setItems(items);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (items === null) return null;
 
   return (
     <section className="section-manuscript flex-1">
@@ -30,7 +41,7 @@ export default function BuyCoursesPage() {
 
         <div className="mt-10">
           <CourseListing
-            items={purchasable}
+            items={items}
             renderCard={({ course, enrollment }) => (
               <BuyCourseCard key={course.id} course={course} enrollment={enrollment} />
             )}
