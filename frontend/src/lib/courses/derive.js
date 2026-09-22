@@ -7,9 +7,9 @@ import { getEnrollmentForCourse, hasActiveAccess } from "./enrollment";
 
 // Courses with no active enrollment — never purchased, or previously
 // purchased and now expired. Excludes anything the learner currently owns.
-export function getPurchasableCourses() {
+export function getPurchasableCourses(overrides = {}) {
   return COURSES.map((course) => {
-    const enrollment = getEnrollmentForCourse(course.id);
+    const enrollment = getEnrollmentForCourse(course.id, overrides);
     return { course, enrollment };
   }).filter(({ enrollment }) => !hasActiveAccess(enrollment));
 }
@@ -17,9 +17,9 @@ export function getPurchasableCourses() {
 // Courses the learner currently has active access to — the inverse of
 // getPurchasableCourses(). An expired enrollment does not count, per the
 // same derivation rule (it belongs in Buy Courses instead).
-export function getMyLearningCourses() {
+export function getMyLearningCourses(overrides = {}) {
   return COURSES.map((course) => {
-    const enrollment = getEnrollmentForCourse(course.id);
+    const enrollment = getEnrollmentForCourse(course.id, overrides);
     return { course, enrollment };
   }).filter(({ enrollment }) => hasActiveAccess(enrollment));
 }

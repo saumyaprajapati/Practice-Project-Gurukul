@@ -1,9 +1,10 @@
+import Link from "next/link";
 import { getCourseState } from "@/lib/courses/enrollment";
+import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 
 // Extends the same chaitya-arch/surface-earthy pattern as BuyCourseCard,
-// with a progress bar and a state-driven CTA instead of a price. No actual
-// playback (Dashboard-2 §"Learning course states") — the CTA is the same
-// inert-button placeholder pattern BuyCourseCard already established.
+// with a progress bar and a state-driven CTA instead of a price. The CTA
+// navigates to the Course Detail page's interactive lesson experience.
 const CTA_LABEL = {
   "not-started": "Start Learning",
   "in-progress": "Continue Learning",
@@ -49,15 +50,12 @@ export default function MyLearningCourseCard({ course, enrollment }) {
       </div>
       <p className="mt-1 text-center text-sm text-charcoal/70">{progress}% complete</p>
 
-      <button
-        type="button"
-        disabled
-        aria-disabled="true"
-        title="Course playback isn't available yet."
-        className="surface-earthy mt-4 block rounded px-4 py-2 text-center text-sm font-medium opacity-60"
+      <Link
+        href={GURUKUL_ROUTES.courseDetail(course.id)}
+        className="surface-earthy mt-4 block rounded px-4 py-2 text-center text-sm font-medium"
       >
         {CTA_LABEL[state]}
-      </button>
+      </Link>
     </li>
   );
 }

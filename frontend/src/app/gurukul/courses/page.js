@@ -3,6 +3,7 @@
 import CourseListing from "@/components/gurukul/CourseListing";
 import BuyCourseCard from "@/components/gurukul/BuyCourseCard";
 import { getPurchasableCourses } from "@/lib/courses/derive";
+import { useOverrides } from "@/lib/courses/enrollmentStore";
 
 // Courses the learner can purchase: never-owned courses and courses whose
 // access has expired. Actively-owned courses are excluded — they belong in
@@ -14,7 +15,8 @@ import { getPurchasableCourses } from "@/lib/courses/derive";
 // make) because CourseListing owns interactive query/page state and Next.js
 // won't let a Server Component pass a render-function prop into it.
 export default function BuyCoursesPage() {
-  const purchasable = getPurchasableCourses();
+  const { overrides } = useOverrides();
+  const purchasable = getPurchasableCourses(overrides);
 
   return (
     <section className="section-manuscript flex-1">
