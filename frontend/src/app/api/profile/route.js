@@ -10,7 +10,7 @@ export async function GET() {
   const supabase = getSupabaseClient();
   const { data: user, error } = await supabase
     .from("users")
-    .select("id, name, email")
+    .select("id, name, email, is_instructor, is_admin")
     .eq("id", session.userId)
     .maybeSingle();
 
@@ -18,5 +18,13 @@ export async function GET() {
     return Response.json({ error: "Profile not found." }, { status: 404 });
   }
 
-  return Response.json({ user });
+  return Response.json({
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      isInstructor: user.is_instructor,
+      isAdmin: user.is_admin,
+    },
+  });
 }

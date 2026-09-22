@@ -18,3 +18,11 @@ export async function getCourseById(id) {
     throw error;
   }
 }
+
+// Real authored curriculum (course_modules/course_lessons), replacing the
+// old client-side generator (lib/courses/curriculum.js used to build this
+// on the fly from just the course object).
+export async function getCourseCurriculum(courseId) {
+  const { courseId: id, modules } = await apiFetch(`/api/courses/${courseId}/curriculum`);
+  return { courseId: id, modules };
+}

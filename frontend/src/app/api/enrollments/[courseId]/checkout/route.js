@@ -16,8 +16,12 @@ export async function POST(request, { params }) {
   const { courseId } = await params;
   const supabase = getSupabaseClient();
 
-  const { data: course } = await supabase.from("courses").select("id").eq("id", courseId).maybeSingle();
-  if (!course) {
+  const { data: course } = await supabase
+    .from("courses")
+    .select("id, status")
+    .eq("id", courseId)
+    .maybeSingle();
+  if (!course || course.status !== "approved") {
     return Response.json({ error: "Course not found." }, { status: 404 });
   }
 

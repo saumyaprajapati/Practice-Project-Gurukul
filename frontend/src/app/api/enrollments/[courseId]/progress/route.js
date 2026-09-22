@@ -2,7 +2,6 @@ import { getAuthenticatedUser } from "@/lib/server/auth";
 import { getSupabaseClient } from "@/lib/server/supabaseClient";
 import { mapEnrollmentRow } from "@/lib/server/enrollments";
 import { hasActiveAccess } from "@/lib/courses/enrollment";
-import { getTotalLessonCount } from "@/lib/courses/curriculum";
 
 export async function GET(request, { params }) {
   const session = await getAuthenticatedUser();
@@ -72,8 +71,11 @@ export async function POST(request, { params }) {
   }
 
   const completedLessonIds = rows.map((row) => row.lesson_id);
-  const totalCount = getTotalLessonCount();
-  const percent = totalCount === 0 ? 0 : Math.round((completedLessonIds.length / totalCount) * 100);
+  const { count: totalCount } = await supabase
+    .from("course_lessons")
+    .select("id", { count: "exact", head: true })
+    .eq("course_id", courseId);
+  const percent = !totalCount ? 0 : Math.round((completedLessonIds.length / totalCount) * 100);
 
   await supabase
     .from("enrollments")

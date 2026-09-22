@@ -1,10 +1,9 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { getCourseById } from "@/lib/courses/courses";
+import { getCourseById, getCourseCurriculum } from "@/lib/courses/courses";
 import { getEnrollmentForCourse, hasActiveAccess } from "@/lib/courses/enrollment";
 import { getLessonProgress } from "@/lib/courses/progress";
-import { getCurriculumForCourse } from "@/lib/courses/curriculum";
 import CourseHero from "@/components/gurukul/course-detail/CourseHero";
 import CourseOverview from "@/components/gurukul/course-detail/CourseOverview";
 import CourseLearningExperience from "@/components/gurukul/course-detail/CourseLearningExperience";
@@ -27,8 +26,9 @@ export default function CourseDetailPage({ params }) {
       getCourseById(courseId),
       getEnrollmentForCourse(courseId),
       getLessonProgress(courseId),
-    ]).then(([course, enrollment, completedLessonIds]) => {
-      if (!cancelled) setData({ course, enrollment, completedLessonIds });
+      getCourseCurriculum(courseId),
+    ]).then(([course, enrollment, completedLessonIds, curriculum]) => {
+      if (!cancelled) setData({ course, enrollment, completedLessonIds, curriculum });
     });
     return () => {
       cancelled = true;
@@ -37,8 +37,7 @@ export default function CourseDetailPage({ params }) {
 
   if (!data) return null;
 
-  const { course, enrollment, completedLessonIds } = data;
-  const curriculum = getCurriculumForCourse(course);
+  const { course, enrollment, completedLessonIds, curriculum } = data;
   const hasAccess = hasActiveAccess(enrollment);
   const isExpired = enrollment?.status === "expired";
 

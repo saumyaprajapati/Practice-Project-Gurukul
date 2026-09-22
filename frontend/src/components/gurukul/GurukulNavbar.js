@@ -5,18 +5,32 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ProfileMenu from "@/components/landing/ProfileMenu";
 import { logout } from "@/lib/auth/session";
+import { getCurrentUserProfile } from "@/lib/auth/profile";
 import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 
-const HUB_LINKS = [
+const BASE_LINKS = [
   { label: "My Learning", href: GURUKUL_ROUTES.learning },
   { label: "Buy Courses", href: GURUKUL_ROUTES.courses },
 ];
 
 // Authenticated-area navbar. Reuses ProfileMenu exactly as the landing
 // Navbar renders it (trailing end of the nav list) — see Dashboard-0 §2.4.
+// "My Courses"/"Admin" only show once the profile fetch confirms the role —
+// same render-safe-default-then-resolve pattern used throughout this app.
 export default function GurukulNavbar() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [roles, setRoles] = useState({ isInstructor: false, isAdmin: false });
+
+  useEffect(() => {
+    let cancelled = false;
+    getCurrentUserProfile().then((profile) => {
+      if (!cancelled) setRoles({ isInstructor: profile.isInstructor, isAdmin: profile.isAdmin });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -34,6 +48,12 @@ export default function GurukulNavbar() {
     router.push("/");
   }
 
+  const links = [
+    ...BASE_LINKS,
+    ...(roles.isInstructor ? [{ label: "My Courses", href: GURUKUL_ROUTES.myCourses }] : []),
+    ...(roles.isAdmin ? [{ label: "Admin", href: GURUKUL_ROUTES.adminCourses }] : []),
+  ];
+
   return (
     <header className="section-dark">
       <nav
@@ -45,7 +65,7 @@ export default function GurukulNavbar() {
         </Link>
 
         <ul className="hidden md:flex md:items-center md:gap-8">
-          {HUB_LINKS.map((link) => (
+          {links.map((link) => (
             <li key={link.href}>
               <Link href={link.href}>{link.label}</Link>
             </li>
@@ -84,7 +104,7 @@ export default function GurukulNavbar() {
 
       <div id="gurukul-mobile-menu" className={isOpen ? "block md:hidden" : "hidden"}>
         <ul className="section-inner !py-4 flex flex-col gap-4">
-          {HUB_LINKS.map((link) => (
+          {links.map((link) => (
             <li key={link.href}>
               <Link href={link.href} onClick={() => setIsOpen(false)}>
                 {link.label}

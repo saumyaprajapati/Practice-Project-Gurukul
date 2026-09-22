@@ -5,6 +5,10 @@ export async function getCurrentUserProfile() {
   return data.user;
 }
 
+export async function becomeInstructor() {
+  await apiFetch("/api/profile/become-instructor", { method: "POST" });
+}
+
 export async function updatePassword(currentPassword, newPassword, confirmNewPassword) {
   try {
     await apiFetch("/api/profile/password", {

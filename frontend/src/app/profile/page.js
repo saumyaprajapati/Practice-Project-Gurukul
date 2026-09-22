@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import AuthCard from "@/components/auth/AuthCard";
 import AuthHeader from "@/components/auth/AuthHeader";
 import AuthInput from "@/components/auth/AuthInput";
 import AuthButton from "@/components/auth/AuthButton";
 import AuthError from "@/components/auth/AuthError";
 import { validatePassword, validatePasswordsMatch } from "@/lib/auth/validation";
-import { getCurrentUserProfile, updatePassword } from "@/lib/auth/profile";
+import { getCurrentUserProfile, updatePassword, becomeInstructor } from "@/lib/auth/profile";
+import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 
 // Name/Email are read-only (no edit controls, per Dashboard-3 scope); only
 // the password fields are editable. Reuses the same Auth* form primitives
@@ -20,6 +22,7 @@ export default function ProfilePage() {
   const [errors, setErrors] = useState({ newPassword: null });
   const [formError, setFormError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [isBecomingInstructor, setIsBecomingInstructor] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -64,6 +67,12 @@ export default function ProfilePage() {
     setSuccessMessage("Password updated.");
   }
 
+  async function handleBecomeInstructor() {
+    setIsBecomingInstructor(true);
+    await becomeInstructor();
+    setProfile((prev) => ({ ...prev, isInstructor: true }));
+  }
+
   if (!profile) return null;
 
   return (
@@ -80,6 +89,32 @@ export default function ProfilePage() {
           value={profile.email}
           disabled
         />
+
+        <h2 className="mt-6 mb-4 font-semibold text-charcoal">Teaching</h2>
+        {profile.isInstructor ? (
+          <div className="flex flex-wrap gap-4 text-sm">
+            <Link href={GURUKUL_ROUTES.myCourses} className="underline underline-offset-4">
+              My Courses
+            </Link>
+            <Link href={GURUKUL_ROUTES.createCourse} className="underline underline-offset-4">
+              Create a Course
+            </Link>
+            {profile.isAdmin ? (
+              <Link href={GURUKUL_ROUTES.adminCourses} className="underline underline-offset-4">
+                Admin
+              </Link>
+            ) : null}
+          </div>
+        ) : (
+          <AuthButton
+            type="button"
+            variant="secondary"
+            onClick={handleBecomeInstructor}
+            disabled={isBecomingInstructor}
+          >
+            Become an Instructor
+          </AuthButton>
+        )}
 
         <h2 className="mt-6 mb-4 font-semibold text-charcoal">Password</h2>
         <form onSubmit={handleSubmit} noValidate>

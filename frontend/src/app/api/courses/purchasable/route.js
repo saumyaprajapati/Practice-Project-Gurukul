@@ -19,6 +19,7 @@ export async function GET() {
       supabase
         .from("courses")
         .select("id, title, description, category, instructor, thumbnail, price")
+        .eq("status", "approved")
         .order("title"),
       supabase.from("enrollments").select("*").eq("user_id", session.userId),
     ]);
