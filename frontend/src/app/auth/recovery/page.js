@@ -7,19 +7,22 @@ import AuthCard from "@/components/auth/AuthCard";
 import AuthHeader from "@/components/auth/AuthHeader";
 import AuthInput from "@/components/auth/AuthInput";
 import AuthButton from "@/components/auth/AuthButton";
+import AuthError from "@/components/auth/AuthError";
 import AuthFooterNav from "@/components/auth/AuthFooterNav";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { setAuthHandoff } from "@/lib/auth/handoff";
 import { validateEmail } from "@/lib/auth/validation";
+import { apiFetch } from "@/lib/apiClient";
 
 export default function RecoveryPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState({ email: null });
+  const [formError, setFormError] = useState(null);
 
   const canSubmit = email.trim().length > 0;
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     const emailError = validateEmail(email);
@@ -29,8 +32,15 @@ export default function RecoveryPage() {
     }
 
     setErrors({ email: null });
-    setAuthHandoff({ intent: "recovery", email });
-    router.push(AUTH_ROUTES.code);
+    setFormError(null);
+
+    try {
+      await apiFetch("/api/auth/recovery", { method: "POST", body: { email } });
+      setAuthHandoff({ intent: "recovery", email });
+      router.push(AUTH_ROUTES.code);
+    } catch (error) {
+      setFormError(error.message);
+    }
   }
 
   return (
@@ -54,6 +64,7 @@ export default function RecoveryPage() {
         <AuthButton type="submit" className="w-full" disabled={!canSubmit}>
           Continue
         </AuthButton>
+        <AuthError message={formError} />
       </form>
       <AuthFooterNav>
         <p>

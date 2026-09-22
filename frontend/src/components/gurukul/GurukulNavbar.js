@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ProfileMenu from "@/components/landing/ProfileMenu";
-import { clearAuthenticated } from "@/lib/auth/session";
+import { logout } from "@/lib/auth/session";
 import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 
 const HUB_LINKS = [
@@ -29,8 +29,8 @@ export default function GurukulNavbar() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [isOpen]);
 
-  function handleSignOut() {
-    clearAuthenticated();
+  async function handleSignOut() {
+    await logout();
     router.push("/");
   }
 

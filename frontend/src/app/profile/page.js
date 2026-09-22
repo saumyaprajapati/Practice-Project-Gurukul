@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AuthCard from "@/components/auth/AuthCard";
 import AuthHeader from "@/components/auth/AuthHeader";
 import AuthInput from "@/components/auth/AuthInput";
@@ -13,14 +13,25 @@ import { getCurrentUserProfile, updatePassword } from "@/lib/auth/profile";
 // the password fields are editable. Reuses the same Auth* form primitives
 // the auth screens already use — no Hub-specific form components invented.
 export default function ProfilePage() {
-  const profile = getCurrentUserProfile();
+  const [profile, setProfile] = useState(null);
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({ newPassword: null });
   const [formError, setFormError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  function handleSubmit(event) {
+  useEffect(() => {
+    let cancelled = false;
+    getCurrentUserProfile().then((data) => {
+      if (!cancelled) setProfile(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function handleSubmit(event) {
     event.preventDefault();
     setSuccessMessage(null);
 
@@ -40,11 +51,20 @@ export default function ProfilePage() {
 
     setErrors({ newPassword: null });
     setFormError(null);
-    updatePassword();
+
+    const result = await updatePassword(currentPassword, newPassword, confirmPassword);
+    if (!result.success) {
+      setFormError(result.error);
+      return;
+    }
+
+    setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
     setSuccessMessage("Password updated.");
   }
+
+  if (!profile) return null;
 
   return (
     <section className="section-manuscript flex flex-1 items-center justify-center px-4 py-16">
@@ -63,6 +83,16 @@ export default function ProfilePage() {
 
         <h2 className="mt-6 mb-4 font-semibold text-charcoal">Password</h2>
         <form onSubmit={handleSubmit} noValidate>
+          <AuthInput
+            id="currentPassword"
+            name="currentPassword"
+            label="Current Password"
+            type="password"
+            value={currentPassword}
+            onChange={(event) => setCurrentPassword(event.target.value)}
+            required
+            autoComplete="current-password"
+          />
           <AuthInput
             id="newPassword"
             name="newPassword"

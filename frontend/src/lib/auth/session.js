@@ -1,32 +1,28 @@
-// Client-side stand-in for a real authenticated session. This is the one
-// source of truth for "is the current user authenticated" across the
-// prototype — not a real session/JWT (that stays out of scope until a
-// backend exists), but isolated behind these functions so a real
-// session/token check can replace the body later without touching call
-// sites (the landing header, Login, Code Entry, Signup/Login route
-// guards).
-const SESSION_KEY = "gurukul.auth.session";
+import { apiFetch } from "@/lib/apiClient";
 
-export function setAuthenticated() {
+// Real authenticated-session check, backed by the httpOnly session cookie
+// the server sets/clears — isolated behind these functions the same way
+// the mock version was, so call sites (guard.js, the landing header,
+// Login/Signup's "already authenticated" redirect) barely changed shape,
+// just became async.
+export async function getSession() {
   try {
-    localStorage.setItem(SESSION_KEY, "true");
+    const data = await apiFetch("/api/auth/me");
+    return data.authenticated ? data.user : null;
   } catch {
-    // localStorage unavailable — nothing to persist.
+    return null;
   }
 }
 
-export function isAuthenticated() {
-  try {
-    return localStorage.getItem(SESSION_KEY) === "true";
-  } catch {
-    return false;
-  }
+export async function isAuthenticated() {
+  return Boolean(await getSession());
 }
 
-export function clearAuthenticated() {
+export async function logout() {
   try {
-    localStorage.removeItem(SESSION_KEY);
+    await apiFetch("/api/auth/logout", { method: "POST" });
   } catch {
-    // Nothing to clear.
+    // Best-effort — the client-side redirect after calling this happens
+    // regardless.
   }
 }

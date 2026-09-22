@@ -16,12 +16,20 @@ export function useRequireAuth() {
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.replace(AUTH_ROUTES.login);
-      return;
-    }
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage can't be read during SSR; the check must run post-mount.
-    setChecked(true);
+    let cancelled = false;
+
+    isAuthenticated().then((authed) => {
+      if (cancelled) return;
+      if (!authed) {
+        router.replace(AUTH_ROUTES.login);
+        return;
+      }
+      setChecked(true);
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   return checked;

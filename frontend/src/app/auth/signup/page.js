@@ -20,6 +20,7 @@ import {
   HONEYPOT_BLOCKED_MESSAGE,
 } from "@/lib/auth/honeypot";
 import { isAuthenticated } from "@/lib/auth/session";
+import { apiFetch } from "@/lib/apiClient";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -34,12 +35,16 @@ export default function SignupPage() {
   const canSubmit = email.trim().length > 0 && password.length > 0;
 
   useEffect(() => {
-    if (isAuthenticated()) {
-      router.replace(getPostAuthDestination());
-    }
+    let cancelled = false;
+    isAuthenticated().then((authed) => {
+      if (!cancelled && authed) router.replace(getPostAuthDestination());
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     if (isHoneypotLocked()) {
@@ -69,8 +74,17 @@ export default function SignupPage() {
 
     setErrors({ email: null, password: null });
     setFormError(null);
-    setAuthHandoff({ intent: "signup", email });
-    router.push(AUTH_ROUTES.code);
+
+    try {
+      await apiFetch("/api/auth/signup", {
+        method: "POST",
+        body: { name, email, password, confirmPassword, honeypot },
+      });
+      setAuthHandoff({ intent: "signup", email });
+      router.push(AUTH_ROUTES.code);
+    } catch (error) {
+      setFormError(error.message);
+    }
   }
 
   return (

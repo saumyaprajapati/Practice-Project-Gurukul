@@ -14,18 +14,23 @@ import Performance from "./Performance";
 import Completion from "./Completion";
 import FinalCTA from "./FinalCTA";
 import Footer from "./Footer";
-import { isAuthenticated, clearAuthenticated } from "@/lib/auth/session";
+import { isAuthenticated, logout } from "@/lib/auth/session";
 
 export default function LandingPage() {
   const [isAuthed, setIsAuthed] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage can't be read during SSR; this must run post-mount to avoid a hydration mismatch.
-    setIsAuthed(isAuthenticated());
+    let cancelled = false;
+    isAuthenticated().then((authed) => {
+      if (!cancelled) setIsAuthed(authed);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  function handleSignOut() {
-    clearAuthenticated();
+  async function handleSignOut() {
+    await logout();
     setIsAuthed(false);
   }
 

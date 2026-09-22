@@ -1,19 +1,18 @@
-// Mock profile data + password-update service. There's no persisted user
-// account anywhere in this prototype (AUTH-00 explicitly rules that out),
-// so this is a static mock, isolated behind these functions the same way
-// lib/courses/enrollment.js isolates its mock user — a real API can
-// replace the bodies later without touching the Profile page.
-const MOCK_PROFILE = {
-  name: "Guest Learner",
-  email: "learner@example.com",
-};
+import { apiFetch } from "@/lib/apiClient";
 
-export function getCurrentUserProfile() {
-  return MOCK_PROFILE;
+export async function getCurrentUserProfile() {
+  const data = await apiFetch("/api/profile");
+  return data.user;
 }
 
-// Does not claim a server was contacted — always "succeeds" for any
-// password that already passed validation in the caller.
-export function updatePassword() {
-  return { success: true };
+export async function updatePassword(currentPassword, newPassword, confirmNewPassword) {
+  try {
+    await apiFetch("/api/profile/password", {
+      method: "PATCH",
+      body: { currentPassword, newPassword, confirmNewPassword },
+    });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
 }
