@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import AuthCard from "@/components/auth/AuthCard";
 import AuthHeader from "@/components/auth/AuthHeader";
 import AuthInput from "@/components/auth/AuthInput";
 import AuthButton from "@/components/auth/AuthButton";
 import AuthError from "@/components/auth/AuthError";
+import TurnstileWidget from "@/components/auth/TurnstileWidget";
 import { validatePassword, validatePasswordsMatch } from "@/lib/auth/validation";
 import { getCurrentUserProfile, updatePassword, becomeInstructor } from "@/lib/auth/profile";
 import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
@@ -15,6 +16,7 @@ import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 // the password fields are editable. Reuses the same Auth* form primitives
 // the auth screens already use — no Hub-specific form components invented.
 export default function ProfilePage() {
+  const turnstileRef = useRef(null);
   const [profile, setProfile] = useState(null);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -52,10 +54,19 @@ export default function ProfilePage() {
       return;
     }
 
+    // Re-checking the current password is a sign-in, which Turnstile protects.
+    const captchaToken = turnstileRef.current?.getResponse();
+    if (!captchaToken) {
+      setErrors({ newPassword: null });
+      setFormError("Please complete the security check.");
+      return;
+    }
+
     setErrors({ newPassword: null });
     setFormError(null);
 
-    const result = await updatePassword(currentPassword, newPassword, confirmPassword);
+    const result = await updatePassword(currentPassword, newPassword, confirmPassword, captchaToken);
+    turnstileRef.current?.reset();
     if (!result.success) {
       setFormError(result.error);
       return;
@@ -149,6 +160,7 @@ export default function ProfilePage() {
             required
             autoComplete="new-password"
           />
+          <TurnstileWidget ref={turnstileRef} />
           <AuthButton type="submit" className="w-full">
             Update Password
           </AuthButton>

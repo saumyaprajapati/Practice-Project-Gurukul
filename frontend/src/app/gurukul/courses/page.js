@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import CourseListing from "@/components/gurukul/CourseListing";
 import BuyCourseCard from "@/components/gurukul/BuyCourseCard";
-import { apiFetch } from "@/lib/apiClient";
+import { getPurchasableCourses } from "@/lib/courses/enrollment";
 
 // Courses the learner can purchase: never-owned courses and courses whose
 // access has expired. Actively-owned courses are excluded — they belong in
@@ -19,7 +19,7 @@ export default function BuyCoursesPage() {
 
   useEffect(() => {
     let cancelled = false;
-    apiFetch("/api/courses/purchasable").then(({ items }) => {
+    getPurchasableCourses().then(({ items }) => {
       if (!cancelled) setItems(items);
     });
     return () => {
