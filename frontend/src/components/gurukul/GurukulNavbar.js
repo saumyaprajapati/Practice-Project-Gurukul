@@ -51,7 +51,7 @@ export default function GurukulNavbar() {
   const links = [
     ...BASE_LINKS,
     ...(roles.isInstructor ? [{ label: "My Courses", href: GURUKUL_ROUTES.myCourses }] : []),
-    ...(roles.isAdmin ? [{ label: "Admin", href: GURUKUL_ROUTES.adminCourses }] : []),
+    ...(roles.isAdmin ? [{ label: "Admin", href: GURUKUL_ROUTES.admin }] : []),
   ];
 
   return (

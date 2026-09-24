@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUserProfile } from "@/lib/auth/profile";
 import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
@@ -33,4 +33,13 @@ export function useRequireAdmin() {
   }, [router]);
 
   return profile;
+}
+
+// app/gurukul/admin/layout.js runs useRequireAdmin() once and shares the
+// signed-in admin's profile with every admin page through this context
+// (e.g. so the Users page can disable actions on the admin's own row).
+export const AdminProfileContext = createContext(null);
+
+export function useAdminProfile() {
+  return useContext(AdminProfileContext);
 }
