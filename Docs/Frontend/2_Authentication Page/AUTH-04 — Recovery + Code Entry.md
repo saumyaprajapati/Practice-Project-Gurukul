@@ -1,5 +1,7 @@
 # GURUKUL — AUTHENTICATION IMPLEMENTATION DOCUMENT 04
 
+> **Superseded backend (Phase 5):** codes are now 6 digits, generated and emailed by Supabase Auth (`verifyOtp` with type `email` / `recovery`), with a "Resend code" action on the code screen. See `frontend/supabase/README-phase5.md`.
+
 ## EMAIL RECOVERY + EMAIL CODE ENTRY
 
 ### SCOPE

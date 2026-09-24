@@ -1,5 +1,7 @@
 # GURUKUL — AUTHENTICATION IMPLEMENTATION DOCUMENT 00
 
+> **Superseded backend (Phase 5):** authentication now runs on Supabase Auth — 6-digit emailed codes, Cloudflare Turnstile instead of the image `Captcha`, Supabase session cookies instead of a custom JWT. The screens and flow below are unchanged; see `frontend/supabase/README-phase5.md` for the current setup.
+
 ## FOUNDATION + SHARED CONTRACT
 
 ### PURPOSE

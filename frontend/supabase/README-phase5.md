@@ -37,6 +37,23 @@ Every user signs in once more after cutover (old `gurukul_session` cookies are d
 Local testing: Turnstile always-pass keys — site key `1x00000000000000000000AA`,
 secret `1x0000000000000000000000000000000AA`.
 
+## Custom SMTP (fixes "email rate limit exceeded")
+
+The built-in sender allows only ~2 auth emails per hour and only to project
+team addresses, so signup/recovery codes run out almost immediately. Any SMTP
+provider works (Resend, Brevo, SendGrid, Postmark, AWS SES…):
+
+1. Create an account with the provider and verify a sending domain (or use its
+   sandbox/test domain while developing).
+2. Supabase → Authentication → Emails → **SMTP Settings** → enable custom SMTP
+   and fill in host, port (587), username, password, sender email and sender
+   name (e.g. `Gurukul <no-reply@yourdomain>`).
+3. Supabase → Authentication → **Rate Limits**: custom SMTP starts at 30
+   emails/hour — raise it if needed.
+4. Re-test signup, "Resend code" and password recovery.
+
+The `{{ .Token }}` email templates above keep working unchanged.
+
 ## Making an admin
 
 ```sql

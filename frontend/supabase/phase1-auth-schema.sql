@@ -1,5 +1,7 @@
 -- Phase 1 (Foundation, DB & Auth) — run once in the Supabase SQL editor.
 -- Tables for courses/enrollments/lesson_progress are added in later phases.
+-- Superseded by Phase 5 (README-phase5.md): accounts live in Supabase Auth +
+-- public.profiles, and phase5c-cutover.sql renames these tables to legacy_*.
 
 create extension if not exists "pgcrypto";
 
