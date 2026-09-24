@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AuthCard from "@/components/auth/AuthCard";
@@ -10,6 +10,7 @@ import AuthButton from "@/components/auth/AuthButton";
 import AuthError from "@/components/auth/AuthError";
 import AuthFooterNav from "@/components/auth/AuthFooterNav";
 import HoneypotField from "@/components/auth/HoneypotField";
+import TurnstileWidget from "@/components/auth/TurnstileWidget";
 import { AUTH_ROUTES, getPostAuthDestination } from "@/lib/auth/routes";
 import { setAuthHandoff } from "@/lib/auth/handoff";
 import { validateEmail, validatePassword, validatePasswordsMatch } from "@/lib/auth/validation";
@@ -20,10 +21,13 @@ import {
   HONEYPOT_BLOCKED_MESSAGE,
 } from "@/lib/auth/honeypot";
 import { isAuthenticated } from "@/lib/auth/session";
-import { apiFetch } from "@/lib/apiClient";
+import { getSupabase } from "@/lib/supabase/client";
+
+const CAPTCHA_REQUIRED_MESSAGE = "Please complete the security check.";
 
 export default function SignupPage() {
   const router = useRouter();
+  const turnstileRef = useRef(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -72,18 +76,32 @@ export default function SignupPage() {
       return;
     }
 
+    const captchaToken = turnstileRef.current?.getResponse();
+    if (!captchaToken) {
+      setFormError(CAPTCHA_REQUIRED_MESSAGE);
+      return;
+    }
+
     setErrors({ email: null, password: null });
     setFormError(null);
 
+    const normalizedEmail = email.trim().toLowerCase();
     try {
-      await apiFetch("/api/auth/signup", {
-        method: "POST",
-        body: { name, email, password, confirmPassword, honeypot },
+      // Supabase doesn't reveal whether the email already has an account:
+      // for an existing address it succeeds but sends no code.
+      const { error } = await getSupabase().auth.signUp({
+        email: normalizedEmail,
+        password,
+        options: { data: { name: name.trim() || "Learner" }, captchaToken },
       });
-      setAuthHandoff({ intent: "signup", email });
+      if (error) {
+        setFormError(error.message);
+        return;
+      }
+      setAuthHandoff({ intent: "signup", email: normalizedEmail });
       router.push(AUTH_ROUTES.code);
-    } catch (error) {
-      setFormError(error.message);
+    } finally {
+      turnstileRef.current?.reset();
     }
   }
 
@@ -131,6 +149,7 @@ export default function SignupPage() {
           required
           autoComplete="new-password"
         />
+        <TurnstileWidget ref={turnstileRef} />
         <HoneypotField value={honeypot} onChange={(event) => setHoneypot(event.target.value)} />
         <AuthButton type="submit" className="w-full" disabled={!canSubmit}>
           Sign Up

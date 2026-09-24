@@ -11,29 +11,33 @@ import AuthError from "@/components/auth/AuthError";
 import AuthFooterNav from "@/components/auth/AuthFooterNav";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { validatePassword, validatePasswordsMatch } from "@/lib/auth/validation";
-import { apiFetch } from "@/lib/apiClient";
+import { getSupabase } from "@/lib/supabase/client";
 
-const RESET_TOKEN_KEY = "gurukul.auth.resetToken";
-
-// The final step of the recovery flow — set a new password using the
-// short-lived reset token issued by /auth/code after a successful
-// recovery OTP verification. There was no such step in the mock version
-// (successful code entry used to just log the user in directly).
+// The final step of the recovery flow. Verifying the recovery code on
+// /auth/code signs the user in, so the new password is set with
+// updateUser() on that session; the user is then signed out and sent to
+// log in with the new password (same behaviour as before).
 export default function ResetPasswordPage() {
   const router = useRouter();
-  const [resetToken, setResetToken] = useState(null);
+  const [hasSession, setHasSession] = useState(null);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({ newPassword: null });
   const [formError, setFormError] = useState(null);
 
   useEffect(() => {
-    try {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- sessionStorage can't be read during SSR; this must run post-mount to avoid a hydration mismatch.
-      setResetToken(sessionStorage.getItem(RESET_TOKEN_KEY) ?? "");
-    } catch {
-      setResetToken("");
-    }
+    let cancelled = false;
+    getSupabase()
+      .auth.getUser()
+      .then(({ data }) => {
+        if (!cancelled) setHasSession(Boolean(data?.user));
+      })
+      .catch(() => {
+        if (!cancelled) setHasSession(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function handleSubmit(event) {
@@ -56,25 +60,19 @@ export default function ResetPasswordPage() {
     setErrors({ newPassword: null });
     setFormError(null);
 
-    try {
-      await apiFetch("/api/auth/reset-password", {
-        method: "POST",
-        body: { resetToken, newPassword, confirmNewPassword: confirmPassword },
-      });
-      try {
-        sessionStorage.removeItem(RESET_TOKEN_KEY);
-      } catch {
-        // Nothing to clear.
-      }
-      router.push(AUTH_ROUTES.login);
-    } catch (error) {
+    const supabase = getSupabase();
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
       setFormError(error.message);
+      return;
     }
+    await supabase.auth.signOut();
+    router.push(AUTH_ROUTES.login);
   }
 
-  if (resetToken === null) return null;
+  if (hasSession === null) return null;
 
-  if (!resetToken) {
+  if (!hasSession) {
     return (
       <AuthCard>
         <AuthHeader title="Reset Password" />
