@@ -110,11 +110,6 @@ export default function ProfilePage() {
             <Link href={GURUKUL_ROUTES.createCourse} className="underline underline-offset-4">
               Create a Course
             </Link>
-            {profile.isAdmin ? (
-              <Link href={GURUKUL_ROUTES.adminCourses} className="underline underline-offset-4">
-                Admin
-              </Link>
-            ) : null}
           </div>
         ) : (
           <AuthButton
@@ -126,6 +121,15 @@ export default function ProfilePage() {
             Become an Instructor
           </AuthButton>
         )}
+
+        {profile.isAdmin ? (
+          <>
+            <h2 className="mt-6 mb-4 font-semibold text-charcoal">Administration</h2>
+            <Link href={GURUKUL_ROUTES.admin} className="text-sm underline underline-offset-4">
+              Open Admin Dashboard
+            </Link>
+          </>
+        ) : null}
 
         <h2 className="mt-6 mb-4 font-semibold text-charcoal">Password</h2>
         <form onSubmit={handleSubmit} noValidate>
