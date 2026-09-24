@@ -48,7 +48,7 @@ Complete: Hero, Navbar, Problem/Platform Notices, Mentors, Progress, Product Exp
 
 ## 2.2 Authentication (AUTH-00 → AUTH-06)
 
-Complete and out of scope for this feature. Routes: `/auth/signup`, `/auth/login`, `/auth/recovery`, `/auth/code`, `/profile` (route exists; its content is Step 3's job — see below). Components: `AuthLayout`, `AuthCard`, `AuthHeader`, `AuthInput`, `AuthButton`, `AuthError`, `AuthFooterNav`, `Captcha`, `HoneypotField`. Authentication is mocked/client-side by design, architected so a real backend can replace it later without rebuilding the screens.
+Complete and out of scope for this feature. Routes: `/auth/signup`, `/auth/login`, `/auth/recovery`, `/auth/code`, `/profile` (route exists; its content is Step 3's job — see below). Components: `AuthLayout`, `AuthCard`, `AuthHeader`, `AuthInput`, `AuthButton`, `AuthError`, `AuthFooterNav`, `Captcha`, `HoneypotField`. Authentication is mocked/client-side by design, architected so a real backend can replace it later without rebuilding the screens. *(Phase 5: that backend is now Supabase Auth, and `Captcha` was replaced by `TurnstileWidget` — see `frontend/supabase/README-phase5.md`.)*
 
 **Do not modify anything under `Docs/Frontend/2_Authentication Page/` or its implementation.** Those documents exactly describe what they had to build, and it was built as specified.
 

@@ -1,14 +1,15 @@
-import { apiFetch } from "@/lib/apiClient";
+import { getSupabase } from "@/lib/supabase/client";
 
-// Real authenticated-session check, backed by the httpOnly session cookie
-// the server sets/clears — isolated behind these functions the same way
-// the mock version was, so call sites (guard.js, the landing header,
-// Login/Signup's "already authenticated" redirect) barely changed shape,
-// just became async.
+// Supabase Auth session check — isolated behind the same three functions as
+// before, so call sites (guard.js, the landing header, Login/Signup's
+// "already authenticated" redirect) didn't change. getUser() validates the
+// session with Supabase Auth rather than trusting the local cookie alone.
 export async function getSession() {
   try {
-    const data = await apiFetch("/api/auth/me");
-    return data.authenticated ? data.user : null;
+    const { data } = await getSupabase().auth.getUser();
+    const user = data?.user;
+    if (!user) return null;
+    return { id: user.id, email: user.email, name: user.user_metadata?.name ?? "Learner" };
   } catch {
     return null;
   }
@@ -20,7 +21,7 @@ export async function isAuthenticated() {
 
 export async function logout() {
   try {
-    await apiFetch("/api/auth/logout", { method: "POST" });
+    await getSupabase().auth.signOut();
   } catch {
     // Best-effort — the client-side redirect after calling this happens
     // regardless.

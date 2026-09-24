@@ -9,7 +9,7 @@ import { getCourseCurriculum } from "@/lib/courses/courses";
 import { addModule, addLesson } from "@/lib/courses/creator";
 import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 
-const EMPTY_LESSON = () => ({ title: "", content: "", durationMinutes: 10 });
+const EMPTY_LESSON = () => ({ title: "", content: "", durationMinutes: 10, isPreview: false });
 
 export default function AddContentPage({ params }) {
   const { courseId } = use(params);
@@ -68,6 +68,7 @@ export default function AddContentPage({ params }) {
           title: lesson.title,
           content: lesson.content,
           durationMinutes: Number(lesson.durationMinutes) || 10,
+          isPreview: lesson.isPreview,
         })),
       });
       setNewModuleTitle("");
@@ -89,6 +90,7 @@ export default function AddContentPage({ params }) {
         title: newLesson.title,
         content: newLesson.content,
         durationMinutes: Number(newLesson.durationMinutes) || 10,
+        isPreview: newLesson.isPreview,
       });
       setNewLesson(EMPTY_LESSON());
       await loadCurriculum();
@@ -180,6 +182,14 @@ export default function AddContentPage({ params }) {
               onChange={(e) => setNewLesson((prev) => ({ ...prev, durationMinutes: e.target.value }))}
               inputMode="numeric"
             />
+            <label className="mb-4 flex items-center gap-2 text-sm text-charcoal">
+              <input
+                type="checkbox"
+                checked={newLesson.isPreview}
+                onChange={(e) => setNewLesson((prev) => ({ ...prev, isPreview: e.target.checked }))}
+              />
+              Free preview (readable before enrolling)
+            </label>
             <AuthButton type="submit" disabled={isSubmittingLesson}>
               {isSubmittingLesson ? "Adding..." : "Add Lesson"}
             </AuthButton>
@@ -231,6 +241,14 @@ export default function AddContentPage({ params }) {
                 onChange={(e) => updateModuleLesson(index, "durationMinutes", e.target.value)}
                 inputMode="numeric"
               />
+              <label className="flex items-center gap-2 text-sm text-charcoal">
+                <input
+                  type="checkbox"
+                  checked={lesson.isPreview}
+                  onChange={(e) => updateModuleLesson(index, "isPreview", e.target.checked)}
+                />
+                Free preview (readable before enrolling)
+              </label>
             </div>
           ))}
 

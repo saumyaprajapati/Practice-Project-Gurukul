@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import CourseListing from "@/components/gurukul/CourseListing";
 import MyLearningCourseCard from "@/components/gurukul/MyLearningCourseCard";
-import { apiFetch } from "@/lib/apiClient";
+import { getMyLearning } from "@/lib/courses/enrollment";
 import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 
 // Courses the learner currently has active access to. Search only shows up
@@ -14,7 +14,7 @@ export default function MyLearningPage() {
 
   useEffect(() => {
     let cancelled = false;
-    apiFetch("/api/courses/my-learning").then(({ items }) => {
+    getMyLearning().then(({ items }) => {
       if (!cancelled) setItems(items);
     });
     return () => {

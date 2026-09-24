@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AuthCard from "@/components/auth/AuthCard";
@@ -9,13 +9,15 @@ import AuthInput from "@/components/auth/AuthInput";
 import AuthButton from "@/components/auth/AuthButton";
 import AuthError from "@/components/auth/AuthError";
 import AuthFooterNav from "@/components/auth/AuthFooterNav";
+import TurnstileWidget from "@/components/auth/TurnstileWidget";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { setAuthHandoff } from "@/lib/auth/handoff";
 import { validateEmail } from "@/lib/auth/validation";
-import { apiFetch } from "@/lib/apiClient";
+import { getSupabase } from "@/lib/supabase/client";
 
 export default function RecoveryPage() {
   const router = useRouter();
+  const turnstileRef = useRef(null);
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState({ email: null });
   const [formError, setFormError] = useState(null);
@@ -31,15 +33,28 @@ export default function RecoveryPage() {
       return;
     }
 
+    const captchaToken = turnstileRef.current?.getResponse();
+    if (!captchaToken) {
+      setFormError("Please complete the security check.");
+      return;
+    }
+
     setErrors({ email: null });
     setFormError(null);
 
+    const normalizedEmail = email.trim().toLowerCase();
     try {
-      await apiFetch("/api/auth/recovery", { method: "POST", body: { email } });
-      setAuthHandoff({ intent: "recovery", email });
+      // Always continues to the code screen, whether or not the account
+      // exists — the response never reveals which emails are registered.
+      const { error } = await getSupabase().auth.resetPasswordForEmail(normalizedEmail, { captchaToken });
+      if (error && (error.code === "over_email_send_rate_limit" || error.status === 429)) {
+        setFormError("Too many attempts. Please try again later.");
+        return;
+      }
+      setAuthHandoff({ intent: "recovery", email: normalizedEmail });
       router.push(AUTH_ROUTES.code);
-    } catch (error) {
-      setFormError(error.message);
+    } finally {
+      turnstileRef.current?.reset();
     }
   }
 
@@ -61,6 +76,7 @@ export default function RecoveryPage() {
           autoComplete="email"
           error={errors.email}
         />
+        <TurnstileWidget ref={turnstileRef} />
         <AuthButton type="submit" className="w-full" disabled={!canSubmit}>
           Continue
         </AuthButton>

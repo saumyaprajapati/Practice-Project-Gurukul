@@ -10,7 +10,7 @@ import { getCurrentUserProfile } from "@/lib/auth/profile";
 import { createCourse } from "@/lib/courses/creator";
 import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 
-const EMPTY_LESSON = () => ({ title: "", content: "", durationMinutes: 10 });
+const EMPTY_LESSON = () => ({ title: "", content: "", durationMinutes: 10, isPreview: false });
 const EMPTY_MODULE = () => ({ title: "", lessons: [EMPTY_LESSON()] });
 
 // Instructor-gated: any signed-in user can reach /gurukul (guarded by
@@ -97,6 +97,7 @@ export default function CreateCoursePage() {
             title: lesson.title,
             content: lesson.content,
             durationMinutes: Number(lesson.durationMinutes) || 10,
+            isPreview: lesson.isPreview,
           })),
         })),
       });
@@ -197,6 +198,14 @@ export default function CreateCoursePage() {
                     onChange={(e) => updateLesson(moduleIndex, lessonIndex, "durationMinutes", e.target.value)}
                     inputMode="numeric"
                   />
+                  <label className="flex items-center gap-2 text-sm text-charcoal">
+                    <input
+                      type="checkbox"
+                      checked={lesson.isPreview}
+                      onChange={(e) => updateLesson(moduleIndex, lessonIndex, "isPreview", e.target.checked)}
+                    />
+                    Free preview (readable before enrolling)
+                  </label>
                 </div>
               ))}
 

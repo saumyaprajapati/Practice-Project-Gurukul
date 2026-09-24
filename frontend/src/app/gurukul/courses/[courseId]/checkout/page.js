@@ -4,14 +4,14 @@ import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getCourseById } from "@/lib/courses/courses";
-import { apiFetch } from "@/lib/apiClient";
+import { checkoutCourse } from "@/lib/courses/enrollment";
 import { formatPrice } from "@/lib/courses/currency";
 import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 
 // A deliberately minimal checkout: an order summary and a single confirm
 // button — no fake card-number fields, so this never resembles a real
-// payment form. Confirming POSTs to the real checkout route, which writes
-// an active enrollment row, then redirects to My Learning, where the
+// payment form. Confirming calls the checkout() RPC, which writes an
+// active enrollment row, then redirects to My Learning, where the
 // course now actually appears. No real payment is ever processed anywhere.
 export default function CheckoutPage({ params }) {
   const { courseId } = use(params);
@@ -31,7 +31,7 @@ export default function CheckoutPage({ params }) {
 
   async function handleCompletePurchase() {
     setIsConfirming(true);
-    await apiFetch(`/api/enrollments/${courseId}/checkout`, { method: "POST" });
+    await checkoutCourse(courseId);
     router.push(GURUKUL_ROUTES.learning);
   }
 
