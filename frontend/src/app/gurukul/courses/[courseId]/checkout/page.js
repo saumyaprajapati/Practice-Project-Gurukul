@@ -1,33 +1,41 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getCourseById } from "@/lib/courses/courses";
-import { getEnrollmentForCourse } from "@/lib/courses/enrollment";
-import { getOverrides, activateEnrollment } from "@/lib/courses/enrollmentStore";
+import { apiFetch } from "@/lib/apiClient";
 import { formatPrice } from "@/lib/courses/currency";
 import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 
-// A deliberately minimal mock checkout: an order summary and a single
-// confirm button — no fake card-number fields, so this never resembles a
-// real payment form. Confirming writes a mock "active" enrollment via
-// enrollmentStore (localStorage-backed) and redirects to My Learning,
-// where the course now actually appears. No real payment is ever
-// processed anywhere.
+// A deliberately minimal checkout: an order summary and a single confirm
+// button — no fake card-number fields, so this never resembles a real
+// payment form. Confirming POSTs to the real checkout route, which writes
+// an active enrollment row, then redirects to My Learning, where the
+// course now actually appears. No real payment is ever processed anywhere.
 export default function CheckoutPage({ params }) {
   const { courseId } = use(params);
-  const course = getCourseById(courseId);
   const router = useRouter();
+  const [course, setCourse] = useState(null);
   const [isConfirming, setIsConfirming] = useState(false);
 
-  function handleCompletePurchase() {
+  useEffect(() => {
+    let cancelled = false;
+    getCourseById(courseId).then((fetchedCourse) => {
+      if (!cancelled) setCourse(fetchedCourse);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [courseId]);
+
+  async function handleCompletePurchase() {
     setIsConfirming(true);
-    const overrides = getOverrides();
-    const existingEnrollment = getEnrollmentForCourse(courseId, overrides);
-    activateEnrollment(courseId, existingEnrollment?.progress ?? 0);
+    await apiFetch(`/api/enrollments/${courseId}/checkout`, { method: "POST" });
     router.push(GURUKUL_ROUTES.learning);
   }
+
+  if (!course) return null;
 
   return (
     <section className="section-manuscript flex-1">

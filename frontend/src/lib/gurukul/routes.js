@@ -6,4 +6,9 @@ export const GURUKUL_ROUTES = {
   courses: "/gurukul/courses",
   courseDetail: (courseId) => `/gurukul/courses/${courseId}`,
   checkout: (courseId) => `/gurukul/courses/${courseId}/checkout`,
+  createCourse: "/gurukul/create-course",
+  myCourses: "/gurukul/my-courses",
+  myCourseAddContent: (courseId) => `/gurukul/my-courses/${courseId}/add-content`,
+  adminCourses: "/gurukul/admin/courses",
+  adminDeletionRequests: "/gurukul/admin/deletion-requests",
 };

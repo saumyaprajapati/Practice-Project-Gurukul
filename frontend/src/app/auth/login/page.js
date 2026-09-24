@@ -20,7 +20,8 @@ import {
   isHoneypotLocked,
   HONEYPOT_BLOCKED_MESSAGE,
 } from "@/lib/auth/honeypot";
-import { isAuthenticated, setAuthenticated } from "@/lib/auth/session";
+import { isAuthenticated } from "@/lib/auth/session";
+import { apiFetch } from "@/lib/apiClient";
 
 const CAPTCHA_MISMATCH_MESSAGE = "That doesn't match the image. Try again.";
 
@@ -44,12 +45,16 @@ export default function LoginPage() {
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated()) {
-      router.replace(getPostAuthDestination());
-    }
+    let cancelled = false;
+    isAuthenticated().then((authed) => {
+      if (!cancelled && authed) router.replace(getPostAuthDestination());
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     if (isHoneypotLocked()) {
@@ -80,8 +85,13 @@ export default function LoginPage() {
 
     setErrors({ email: null, password: null, captcha: null });
     setFormError(null);
-    setAuthenticated();
-    router.push(getPostAuthDestination());
+
+    try {
+      await apiFetch("/api/auth/login", { method: "POST", body: { email, password, honeypot } });
+      router.push(getPostAuthDestination());
+    } catch (error) {
+      setFormError(error.message);
+    }
   }
 
   return (

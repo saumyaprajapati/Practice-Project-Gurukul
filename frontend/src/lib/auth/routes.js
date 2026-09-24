@@ -5,6 +5,7 @@ export const AUTH_ROUTES = {
   signup: "/auth/signup",
   login: "/auth/login",
   recovery: "/auth/recovery",
+  recoveryReset: "/auth/recovery/reset",
   code: "/auth/code",
 };
 

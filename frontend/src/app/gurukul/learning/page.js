@@ -1,18 +1,28 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import CourseListing from "@/components/gurukul/CourseListing";
 import MyLearningCourseCard from "@/components/gurukul/MyLearningCourseCard";
-import { getMyLearningCourses } from "@/lib/courses/derive";
-import { useOverrides } from "@/lib/courses/enrollmentStore";
+import { apiFetch } from "@/lib/apiClient";
 import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 
 // Courses the learner currently has active access to. Search only shows up
-// past 16 owned courses (Dashboard-2 §"Course search") — with the mock
-// data seeded here that stays correctly hidden, not missing.
+// past 16 owned courses (Dashboard-2 §"Course search").
 export default function MyLearningPage() {
-  const { overrides } = useOverrides();
-  const items = getMyLearningCourses(overrides);
+  const [items, setItems] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    apiFetch("/api/courses/my-learning").then(({ items }) => {
+      if (!cancelled) setItems(items);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (items === null) return null;
 
   return (
     <section className="section-manuscript flex-1">
