@@ -86,7 +86,7 @@ export default function CreateCoursePage() {
 
     setIsSubmitting(true);
     try {
-      await createCourse({
+      const { courseId } = await createCourse({
         title,
         description,
         category,
@@ -101,7 +101,9 @@ export default function CreateCoursePage() {
           })),
         })),
       });
-      router.push(GURUKUL_ROUTES.myCourses);
+      // Lessons only exist once the course is created, so videos and files
+      // are attached next, on the course's add-content page.
+      router.push(`${GURUKUL_ROUTES.myCourseAddContent(courseId)}?created=1`);
     } catch (err) {
       setError(err.message);
       setIsSubmitting(false);
@@ -117,7 +119,8 @@ export default function CreateCoursePage() {
         <span className="rule-shirorekha" aria-hidden="true" />
         <p className="mt-6 text-charcoal/80">
           Your course goes live once an admin reviews and approves it. You&apos;ll have instant access to it
-          yourself in the meantime, and you can always add more modules and lessons later from{" "}
+          yourself in the meantime. After submitting you&apos;ll attach each lesson&apos;s video and files, and you
+          can always add more modules and lessons later from{" "}
           <Link href={GURUKUL_ROUTES.myCourses} className="underline underline-offset-4">
             My Courses
           </Link>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import AuthInput from "@/components/auth/AuthInput";
 import AuthButton from "@/components/auth/AuthButton";
 import AuthError from "@/components/auth/AuthError";
+import LessonMediaManager from "@/components/courses/LessonMediaManager";
 import { getCourseCurriculum } from "@/lib/courses/courses";
 import { addModule, addLesson } from "@/lib/courses/creator";
 import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
@@ -16,6 +17,12 @@ export default function AddContentPage({ params }) {
   const router = useRouter();
   const [curriculum, setCurriculum] = useState(null);
   const [error, setError] = useState(null);
+  const [openMediaLessonId, setOpenMediaLessonId] = useState(null);
+  // Set by create-course's redirect. Only rendered client-side (behind the
+  // Hub's auth guard), so reading the URL directly is safe.
+  const [justCreated] = useState(
+    () => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("created")
+  );
 
   const [newModuleTitle, setNewModuleTitle] = useState("");
   const [newModuleLessons, setNewModuleLessons] = useState([EMPTY_LESSON()]);
@@ -108,8 +115,14 @@ export default function AddContentPage({ params }) {
       <div className="section-inner max-w-2xl">
         <h1 className="heading-2">Add Content</h1>
         <span className="rule-shirorekha" aria-hidden="true" />
+        {justCreated ? (
+          <p role="status" className="surface-earthy mt-6 rounded-lg p-4 text-charcoal">
+            Course created and sent for review. Now add videos and files to your lessons below.
+          </p>
+        ) : null}
         <p className="mt-6 text-charcoal/80">
-          Existing modules and lessons can&apos;t be edited or removed — you can only add more.
+          Existing modules and lessons can&apos;t be edited or removed — you can only add more. You can add, replace
+          or remove each lesson&apos;s video and files at any time.
         </p>
 
         <h2 className="mt-8 mb-4 font-semibold text-charcoal">Current Curriculum</h2>
@@ -120,10 +133,35 @@ export default function AddContentPage({ params }) {
             {curriculum.modules.map((module) => (
               <li key={module.id} className="surface-earthy rounded-lg p-4">
                 <p className="font-medium text-charcoal">{module.title}</p>
-                <ul className="mt-2 space-y-1 text-sm text-charcoal/80">
-                  {module.lessons.map((lesson) => (
-                    <li key={lesson.id}>{lesson.title}</li>
-                  ))}
+                <ul className="mt-2 space-y-2 text-sm text-charcoal/80">
+                  {module.lessons.map((lesson) => {
+                    const isOpen = openMediaLessonId === lesson.id;
+                    const mediaCount = (lesson.video ? 1 : 0) + (lesson.files?.length ?? 0);
+                    return (
+                      <li key={lesson.id}>
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <span>
+                            {lesson.title}
+                            <span className="text-charcoal/50">
+                              {lesson.video ? " · video" : " · no video"}
+                              {lesson.files?.length ? ` · ${lesson.files.length} file(s)` : ""}
+                            </span>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setOpenMediaLessonId(isOpen ? null : lesson.id)}
+                            aria-expanded={isOpen}
+                            className="font-medium underline underline-offset-4"
+                          >
+                            {isOpen ? "Close" : mediaCount ? "Videos & files" : "+ Add video / files"}
+                          </button>
+                        </div>
+                        {isOpen ? (
+                          <LessonMediaManager courseId={courseId} lesson={lesson} onChanged={loadCurriculum} />
+                        ) : null}
+                      </li>
+                    );
+                  })}
                 </ul>
               </li>
             ))}
