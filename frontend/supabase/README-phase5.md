@@ -54,6 +54,25 @@ provider works (Resend, Brevo, SendGrid, Postmark, AWS SES…):
 
 The `{{ .Token }}` email templates above keep working unchanged.
 
+## Phase 6 — Admin area (`phase6-admin.sql`)
+
+Run `phase6-admin.sql` in the SQL editor after the cutover (safe to re-run).
+It adds the admin-only RPCs behind `/gurukul/admin`:
+
+| Area | What an admin can do |
+|---|---|
+| Dashboard | Counts of users, courses by status, pending reviews, enrollments |
+| Courses | See every course at any status; edit all details, change status, transfer owner (new owner becomes instructor + gets access); delete instantly |
+| Content | Rename / reorder / delete modules; edit / reorder / delete lessons; toggle free preview; add modules and lessons to any course |
+| Users | Rename, make/remove instructor or admin, ban/unban (blocks sign-in, keeps data), delete permanently |
+| Enrollments | Grant free access, renew, set expiry, revoke, reset progress, delete |
+
+Guard rails (enforced in the database, mirrored in the UI): an admin can't
+remove their own admin role or ban/delete themself, and another admin must be
+demoted before being banned or deleted — so there is always at least one admin.
+Deleting or adding lessons recalculates everyone's progress %, and progress
+for deleted lessons is removed.
+
 ## Making an admin
 
 ```sql
