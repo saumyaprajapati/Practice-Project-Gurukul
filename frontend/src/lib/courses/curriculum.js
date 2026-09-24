@@ -1,8 +1,8 @@
 // Flattens modules/lessons into a single ordered list, for Next/Previous
 // navigation across module boundaries and for lesson-count-based progress.
-// Curriculum data itself now comes from the real course_modules/
-// course_lessons tables (api/courses/[courseId]/curriculum) — this stays
-// the same pure shape-transform either way.
+// Curriculum data itself comes from the real course_modules/course_lessons
+// tables (lib/courses/courses.js getCourseCurriculum) — this stays the same
+// pure shape-transform either way.
 export function flattenLessons(curriculum) {
   const flat = [];
   curriculum.modules.forEach((module, moduleIndex) => {
@@ -17,6 +17,8 @@ export function flattenLessons(curriculum) {
         globalIndex: flat.length,
         durationMinutes: lesson.durationMinutes,
         content: lesson.content,
+        isPreview: Boolean(lesson.isPreview),
+        locked: Boolean(lesson.locked),
       });
     });
   });

@@ -41,13 +41,16 @@ function CheckIcon() {
 // is false in the not-enrolled overview (locked, read-only rows) and true
 // in the enrolled learning experience (clickable lessons with active/
 // completed states), so the same component serves both branches described
-// in the plan rather than two near-duplicate lists.
+// in the plan rather than two near-duplicate lists. In the overview,
+// lessons flagged as free previews stay clickable (onPreviewLesson).
 export default function SyllabusNav({
   curriculum,
   interactive = false,
   currentLessonId,
   completedLessonIds,
   onSelectLesson,
+  previewLessonId,
+  onPreviewLesson,
 }) {
   return (
     <div className="space-y-4">
@@ -58,6 +61,32 @@ export default function SyllabusNav({
             {module.lessons.map((lesson) => {
               const isCompleted = completedLessonIds?.has(lesson.id);
               const isActive = interactive && currentLessonId === lesson.id;
+
+              if (!interactive && lesson.isPreview && !lesson.locked && onPreviewLesson) {
+                const isPreviewing = previewLessonId === lesson.id;
+                return (
+                  <li key={lesson.id}>
+                    <button
+                      type="button"
+                      onClick={() => onPreviewLesson(lesson.id)}
+                      aria-current={isPreviewing ? "true" : undefined}
+                      className={`flex w-full items-center justify-between gap-3 rounded px-3 py-2 text-left text-sm transition-colors hover:bg-gold/10 ${
+                        isPreviewing ? "border-l-4 border-gold bg-gold/10 pl-2 font-medium" : "text-charcoal/80"
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        {lesson.title}
+                        <span className="rounded bg-gold/20 px-2 py-0.5 text-xs font-medium text-charcoal">
+                          Free preview
+                        </span>
+                      </span>
+                      <span className="shrink-0 text-charcoal/50">
+                        {lesson.durationMinutes} min
+                      </span>
+                    </button>
+                  </li>
+                );
+              }
 
               if (!interactive) {
                 return (

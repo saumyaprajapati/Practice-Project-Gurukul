@@ -1,8 +1,8 @@
 import LessonVideoPlayer from "./LessonVideoPlayer";
 
-// Reading-content panel for the currently selected lesson. Content is mock
-// text (lib/courses/curriculum.js) standing in for real lesson material —
-// the video player above it is simulated too (no real media backend).
+// Reading-content panel for the currently selected lesson. Content comes
+// from course_lesson_content — the video player above it is simulated (no
+// real media backend).
 export default function LessonPanel({
   lesson,
   isCompleted,
@@ -22,11 +22,17 @@ export default function LessonPanel({
       <h2 className="mt-1 text-xl font-semibold text-charcoal">{lesson.lessonTitle}</h2>
 
       <div className="mt-4 max-w-prose space-y-3 text-charcoal/90">
-        {lesson.content.map((paragraph, index) => (
-          <p key={index} className="leading-relaxed">
-            {paragraph}
-          </p>
-        ))}
+        {lesson.locked ? (
+          // Safety net: RLS only withholds lesson text from learners without
+          // access, and those never reach this panel.
+          <p className="leading-relaxed text-charcoal/70">Enrol to read this lesson.</p>
+        ) : (
+          lesson.content.map((paragraph, index) => (
+            <p key={index} className="leading-relaxed">
+              {paragraph}
+            </p>
+          ))
+        )}
       </div>
 
       <span className="rule-shirorekha" aria-hidden="true" />

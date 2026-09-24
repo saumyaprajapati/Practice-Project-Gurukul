@@ -9,10 +9,10 @@ import { markLessonComplete } from "@/lib/courses/progress";
 
 // Enrolled branch. Owns the only interactive/stateful part of the Course
 // Detail page: current lesson + completed-lesson set. initialCompletedLessonIds
-// comes from the real lesson_progress table (api/enrollments/[courseId]/
-// progress), so it's exact, not an approximation. Every "Mark Complete"
-// click POSTs to the same route, which recomputes and persists the
-// enrollment's progress_percent — /gurukul/learning reads that on next load.
+// comes from the real lesson_progress table, so it's exact, not an
+// approximation. Every "Mark Complete" click inserts a lesson_progress row;
+// a database trigger recomputes and persists the enrollment's
+// progress_percent — /gurukul/learning reads that on next load.
 export default function CourseLearningExperience({ curriculum, initialCompletedLessonIds }) {
   const flatLessons = useMemo(() => flattenLessons(curriculum), [curriculum]);
 
