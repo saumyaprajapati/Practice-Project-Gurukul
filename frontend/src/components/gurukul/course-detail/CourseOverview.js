@@ -3,6 +3,8 @@
 import { useState } from "react";
 import SyllabusNav from "./SyllabusNav";
 import CourseSidebarCard from "./CourseSidebarCard";
+import LessonVideoPlayer from "./LessonVideoPlayer";
+import LessonResources from "./LessonResources";
 
 // Not-enrolled/expired branch: browsable overview with a locked syllabus
 // and the enroll/renew action. Lessons the instructor flagged as free
@@ -22,6 +24,7 @@ export default function CourseOverview({ course, curriculum, isExpired, expiresA
       <div className="space-y-8">
         {previewLesson ? (
           <div className="surface-earthy rounded-lg p-6 sm:p-8">
+            <LessonVideoPlayer key={previewLesson.id} video={previewLesson.video} title={previewLesson.title} />
             <p className="text-sm text-charcoal/60">Free preview</p>
             <h2 className="mt-1 text-xl font-semibold text-charcoal">{previewLesson.title}</h2>
             <div className="mt-4 max-w-prose space-y-3 text-charcoal/90">
@@ -31,6 +34,7 @@ export default function CourseOverview({ course, curriculum, isExpired, expiresA
                 </p>
               ))}
             </div>
+            <LessonResources key={`files-${previewLesson.id}`} files={previewLesson.files ?? []} />
           </div>
         ) : null}
 

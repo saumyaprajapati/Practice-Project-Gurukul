@@ -147,12 +147,21 @@ export async function getSignedMediaUrl(path) {
   return data.signedUrl;
 }
 
-export async function getSignedDownloadUrl(path, fileName) {
-  const { data, error } = await getSupabase()
-    .storage.from(MEDIA_BUCKET)
-    .createSignedUrl(path, SIGNED_URL_SECONDS, { download: fileName });
-  if (error) throw new ApiError(error.message || "Couldn't load this file.", error.statusCode ?? 500);
-  return data.signedUrl;
+// One request for many files -> { [path]: signedUrl }. Links are prepared up
+// front so "Open" can be a plain link (a window.open after an await would be
+// blocked as a pop-up).
+export async function getSignedMediaUrls(paths) {
+  if (!paths.length) return {};
+  const { data, error } = await getSupabase().storage.from(MEDIA_BUCKET).createSignedUrls(paths, SIGNED_URL_SECONDS);
+  if (error) throw new ApiError(error.message || "Couldn't load these files.", error.statusCode ?? 500);
+  return Object.fromEntries(data.filter((item) => item.signedUrl).map((item) => [item.path, item.signedUrl]));
+}
+
+// Storage serves a signed URL as a download when ?download=<name> is added.
+export function toDownloadUrl(signedUrl, fileName) {
+  const url = new URL(signedUrl);
+  url.searchParams.set("download", fileName);
+  return url.toString();
 }
 
 // YouTube (watch, youtu.be, shorts, embed) and Vimeo links -> privacy-friendly
