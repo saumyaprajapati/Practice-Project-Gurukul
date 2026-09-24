@@ -73,6 +73,38 @@ demoted before being banned or deleted — so there is always at least one admin
 Deleting or adding lessons recalculates everyone's progress %, and progress
 for deleted lessons is removed.
 
+## Phase 7 — Lesson videos and files (`phase7-lesson-media.sql`)
+
+Run `phase7-lesson-media.sql` after `phase6-admin.sql` (safe to re-run). It
+creates the private **`lesson-media`** Storage bucket (50 MB per file; MP4/WebM
+videos, PDFs, images, text, zip, Word/PowerPoint/Excel), the
+`course_lesson_media` table, the storage access policies and the media RPCs.
+
+- Each lesson can have **one video** (an upload, or a YouTube/Vimeo link) and any
+  number of **files**. No video = no player on the lesson.
+- Who sees media: the same rule as lesson text — enrolled learners, the course
+  owner and admins, plus everyone signed in for free-preview lessons. Files are
+  served through signed URLs that expire after an hour.
+- Who manages media: the course owner (add-content page → "Videos & files") and
+  admins (Admin → Courses → Edit → Media).
+- **Storage → Settings → Global file size limit** must be at least 50 MB (the
+  free-plan maximum). Free projects get 1 GB of storage and limited monthly
+  egress — every video view counts, so prefer YouTube/Vimeo links for long or
+  popular videos (set those to *Unlisted*; links can't be locked like uploads).
+- Going Pro later: raise the global limit and the bucket's `file_size_limit`,
+  update `MAX_UPLOAD_BYTES` in `src/lib/courses/media.js`, and use resumable
+  (TUS) uploads for files over ~6 MB.
+
+Orphaned files (uploaded but never registered, e.g. a tab closed mid-upload) —
+list them, then delete them from Storage → lesson-media:
+
+```sql
+select o.name, o.created_at
+from storage.objects o
+where o.bucket_id = 'lesson-media'
+  and not exists (select 1 from public.course_lesson_media m where m.storage_path = o.name);
+```
+
 ## Making an admin
 
 ```sql
