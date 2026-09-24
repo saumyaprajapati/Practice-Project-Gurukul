@@ -100,7 +100,7 @@ export default function CurriculumEditor({ courseId, curriculum, onChanged }) {
                   <ConfirmButton
                     disabled={busy}
                     confirmLabel={`Delete module + ${module.lessons.length} lesson(s)`}
-                    onConfirm={() => run(() => deleteModule(module.id))}
+                    onConfirm={() => run(() => deleteModule(courseId, module.id))}
                   >
                     Delete module
                   </ConfirmButton>

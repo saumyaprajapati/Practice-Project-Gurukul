@@ -4,6 +4,15 @@
 // supabase/phase5b-baas.sql and phase6-admin.sql.
 import { getSupabase } from "@/lib/supabase/client";
 import { toApiError, unwrap } from "@/lib/supabase/errors";
+import { getMediaPaths, removeMediaFiles } from "@/lib/courses/media";
+
+// SQL cascades delete media rows but not the files in Storage, so every
+// delete below collects the file paths first, deletes, then removes the files.
+async function deleteWithMedia(scope, runDelete) {
+  const paths = await getMediaPaths(scope);
+  await runDelete();
+  await removeMediaFiles(paths);
+}
 
 // The FK hint is required: courses and profiles are also linked many-to-many
 // through enrollments, so a bare `profiles(name)` embed would be ambiguous.
@@ -67,8 +76,11 @@ export async function getPendingDeletionRequests() {
   }));
 }
 
-export async function approveDeletionRequest(requestId) {
-  unwrap(await getSupabase().rpc("admin_review_deletion", { p_request_id: requestId, p_approve: true }));
+// Approving deletes the course, so its media files are removed too.
+export async function approveDeletionRequest(requestId, courseId) {
+  await deleteWithMedia({ courseId }, async () =>
+    unwrap(await getSupabase().rpc("admin_review_deletion", { p_request_id: requestId, p_approve: true }))
+  );
   return { success: true };
 }
 
@@ -112,7 +124,9 @@ export async function updateCourse(courseId, { title, description, category, ins
 }
 
 export async function deleteCourse(courseId) {
-  unwrap(await getSupabase().rpc("admin_delete_course", { p_course_id: courseId }));
+  await deleteWithMedia({ courseId }, async () =>
+    unwrap(await getSupabase().rpc("admin_delete_course", { p_course_id: courseId }))
+  );
   return { success: true };
 }
 
@@ -124,8 +138,10 @@ export async function updateModule(moduleId, title) {
   unwrap(await getSupabase().rpc("admin_update_module", { p_module_id: moduleId, p_title: title }));
 }
 
-export async function deleteModule(moduleId) {
-  unwrap(await getSupabase().rpc("admin_delete_module", { p_module_id: moduleId }));
+export async function deleteModule(courseId, moduleId) {
+  await deleteWithMedia({ courseId, moduleId }, async () =>
+    unwrap(await getSupabase().rpc("admin_delete_module", { p_module_id: moduleId }))
+  );
 }
 
 export async function moveModule(moduleId, direction) {
@@ -146,7 +162,9 @@ export async function updateLesson(courseId, lessonKey, { title, content, durati
 }
 
 export async function deleteLesson(courseId, lessonKey) {
-  unwrap(await getSupabase().rpc("admin_delete_lesson", { p_course_id: courseId, p_lesson_key: lessonKey }));
+  await deleteWithMedia({ courseId, lessonKey }, async () =>
+    unwrap(await getSupabase().rpc("admin_delete_lesson", { p_course_id: courseId, p_lesson_key: lessonKey }))
+  );
 }
 
 export async function moveLesson(courseId, lessonKey, direction) {

@@ -65,7 +65,7 @@ export default function AdminDeletionRequestsPage() {
                 <AuthButton
                   type="button"
                   disabled={pendingId === request.id}
-                  onClick={() => handleDecision(request.id, approveDeletionRequest)}
+                  onClick={() => handleDecision(request.id, (id) => approveDeletionRequest(id, request.courseId))}
                 >
                   Approve Deletion
                 </AuthButton>
