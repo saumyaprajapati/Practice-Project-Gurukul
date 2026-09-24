@@ -19,6 +19,8 @@ export function flattenLessons(curriculum) {
         content: lesson.content,
         isPreview: Boolean(lesson.isPreview),
         locked: Boolean(lesson.locked),
+        video: lesson.video ?? null,
+        files: lesson.files ?? [],
       });
     });
   });

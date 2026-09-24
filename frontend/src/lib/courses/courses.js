@@ -14,15 +14,29 @@ export async function getCourseById(id) {
   return data;
 }
 
-// Same shape the old /curriculum route returned, plus isPreview/locked.
-// Lesson text lives in course_lesson_content, which RLS only returns for
-// preview lessons or to enrolled learners/the owner/admins — a lesson whose
-// content row is missing comes back locked with no content.
+function mapMedia(row) {
+  return {
+    id: row.id,
+    kind: row.kind,
+    path: row.storage_path,
+    url: row.external_url,
+    fileName: row.file_name,
+    mimeType: row.mime_type,
+    sizeBytes: row.size_bytes,
+    position: row.position,
+  };
+}
+
+// Same shape the old /curriculum route returned, plus isPreview/locked and
+// media. Lesson text (course_lesson_content) and media (course_lesson_media)
+// share one RLS rule: preview lessons, or enrolled learners/the owner/admins.
+// A lesson whose content row is missing comes back locked, with no content,
+// no video and no files.
 export async function getCourseCurriculum(courseId) {
   const { data, error } = await getSupabase()
     .from("course_modules")
     .select(
-      "id, title, position, course_lessons(id, lesson_key, title, duration_minutes, position, is_preview, course_lesson_content(content))"
+      "id, title, position, course_lessons(id, lesson_key, title, duration_minutes, position, is_preview, course_lesson_content(content), course_lesson_media(id, kind, storage_path, external_url, file_name, mime_type, size_bytes, position))"
     )
     .eq("course_id", courseId)
     .order("position");
@@ -37,6 +51,7 @@ export async function getCourseCurriculum(courseId) {
         const contentRow = Array.isArray(lesson.course_lesson_content)
           ? lesson.course_lesson_content[0]
           : lesson.course_lesson_content;
+        const media = [...(lesson.course_lesson_media ?? [])].sort((a, b) => a.position - b.position).map(mapMedia);
         return {
           id: lesson.lesson_key,
           title: lesson.title,
@@ -44,6 +59,8 @@ export async function getCourseCurriculum(courseId) {
           isPreview: lesson.is_preview,
           locked: !contentRow,
           content: contentRow ? contentRow.content.split(/\n\s*\n/).map((paragraph) => paragraph.trim()) : [],
+          video: media.find((item) => item.kind === "video" || item.kind === "video_link") ?? null,
+          files: media.filter((item) => item.kind === "file"),
         };
       }),
   }));

@@ -6,6 +6,7 @@ import AuthButton from "@/components/auth/AuthButton";
 import AuthError from "@/components/auth/AuthError";
 import ConfirmButton from "@/components/admin/ConfirmButton";
 import LessonEditor from "@/components/admin/LessonEditor";
+import LessonMediaManager from "@/components/courses/LessonMediaManager";
 import {
   updateModule,
   deleteModule,
@@ -27,6 +28,7 @@ export default function CurriculumEditor({ courseId, curriculum, onChanged }) {
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
   const [editingLesson, setEditingLesson] = useState(null); // lesson key
+  const [mediaLesson, setMediaLesson] = useState(null); // lesson key
   const [addingToModule, setAddingToModule] = useState(null); // module id
   const [moduleTitles, setModuleTitles] = useState({});
   const [newModuleTitle, setNewModuleTitle] = useState("");
@@ -100,7 +102,7 @@ export default function CurriculumEditor({ courseId, curriculum, onChanged }) {
                   <ConfirmButton
                     disabled={busy}
                     confirmLabel={`Delete module + ${module.lessons.length} lesson(s)`}
-                    onConfirm={() => run(() => deleteModule(module.id))}
+                    onConfirm={() => run(() => deleteModule(courseId, module.id))}
                   >
                     Delete module
                   </ConfirmButton>
@@ -115,6 +117,8 @@ export default function CurriculumEditor({ courseId, curriculum, onChanged }) {
                         {lessonIndex + 1}. {lesson.title}{" "}
                         <span className="text-charcoal/50">
                           · {lesson.durationMinutes} min{lesson.isPreview ? " · free preview" : ""}
+                          {lesson.video ? " · video" : ""}
+                          {lesson.files?.length ? ` · ${lesson.files.length} file(s)` : ""}
                         </span>
                       </span>
                       <span className="flex flex-wrap items-center gap-3">
@@ -144,6 +148,15 @@ export default function CurriculumEditor({ courseId, curriculum, onChanged }) {
                         >
                           ↓
                         </button>
+                        <button
+                          type="button"
+                          className={SMALL_BUTTON}
+                          disabled={busy}
+                          aria-expanded={mediaLesson === lesson.id}
+                          onClick={() => setMediaLesson(mediaLesson === lesson.id ? null : lesson.id)}
+                        >
+                          {mediaLesson === lesson.id ? "Close media" : "Media"}
+                        </button>
                         <ConfirmButton
                           disabled={busy}
                           confirmLabel="Delete lesson"
@@ -153,6 +166,9 @@ export default function CurriculumEditor({ courseId, curriculum, onChanged }) {
                         </ConfirmButton>
                       </span>
                     </div>
+                    {mediaLesson === lesson.id ? (
+                      <LessonMediaManager courseId={courseId} lesson={lesson} onChanged={onChanged} />
+                    ) : null}
                     {editingLesson === lesson.id ? (
                       <LessonEditor
                         idPrefix={`edit-${lesson.id}`}

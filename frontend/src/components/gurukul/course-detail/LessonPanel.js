@@ -1,8 +1,9 @@
 import LessonVideoPlayer from "./LessonVideoPlayer";
+import LessonResources from "./LessonResources";
 
-// Reading-content panel for the currently selected lesson. Content comes
-// from course_lesson_content — the video player above it is simulated (no
-// real media backend).
+// Panel for the currently selected lesson: its video (only if the
+// instructor added one), reading content from course_lesson_content, and
+// any attached files.
 export default function LessonPanel({
   lesson,
   isCompleted,
@@ -14,7 +15,7 @@ export default function LessonPanel({
 }) {
   return (
     <div className="surface-earthy rounded-lg p-6 sm:p-8">
-      <LessonVideoPlayer key={lesson.lessonId} lesson={lesson} />
+      <LessonVideoPlayer key={lesson.lessonId} video={lesson.video} title={lesson.lessonTitle} />
 
       <p className="text-sm text-charcoal/60">
         {lesson.moduleTitle} · Lesson {lesson.lessonIndex + 1}
@@ -34,6 +35,8 @@ export default function LessonPanel({
           ))
         )}
       </div>
+
+      <LessonResources key={`files-${lesson.lessonId}`} files={lesson.files ?? []} />
 
       <span className="rule-shirorekha" aria-hidden="true" />
 
