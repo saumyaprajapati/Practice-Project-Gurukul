@@ -23,10 +23,6 @@ export function validatePasswordsMatch(password, confirmPassword) {
     : "password and confirm password doesn't match each other";
 }
 
-export function validateCode(value) {
-  return /^\d{4}$/.test(value ?? "") ? null : "Enter the 4-digit code.";
-}
-
 export function hasErrors(errors) {
   return Object.values(errors).some(Boolean);
 }
