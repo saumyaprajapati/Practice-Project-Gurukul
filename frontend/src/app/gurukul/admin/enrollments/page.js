@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import AuthButton from "@/components/auth/AuthButton";
 import AuthError from "@/components/auth/AuthError";
 import ConfirmButton from "@/components/admin/ConfirmButton";
@@ -16,6 +17,7 @@ import {
 } from "@/lib/admin/enrollments";
 import { getAllUsers } from "@/lib/admin/users";
 import { getAllCoursesForAdmin } from "@/lib/admin/courses";
+import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 
 const FIELD_CLASS = "rounded border border-brown/40 bg-cream px-3 py-2 text-sm text-charcoal";
 
@@ -56,7 +58,10 @@ function EnrollmentRow({ enrollment, onReload, onError }) {
         <div>
           <p className="font-semibold text-charcoal">{enrollment.courseTitle}</p>
           <p className="text-sm text-charcoal/70">
-            {enrollment.userName} · {enrollment.userEmail}
+            <Link href={GURUKUL_ROUTES.adminUserProfile(enrollment.userId)} className="underline underline-offset-4">
+              {enrollment.userName}
+            </Link>{" "}
+            · {enrollment.userEmail}
           </p>
           <p className="text-xs text-charcoal/50">
             Since {formatDate(enrollment.purchasedAt)} · {isActive ? "expires" : "ended"} {formatDate(enrollment.expiresAt)} ·{" "}

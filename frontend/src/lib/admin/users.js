@@ -21,6 +21,13 @@ export async function getAllUsers() {
   }));
 }
 
+// One user for the admin profile page, or null. Reuses admin_list_users()
+// (fine at this app's size — add an admin_get_user(uuid) RPC if it grows).
+export async function getUserForAdmin(userId) {
+  const users = await getAllUsers();
+  return users.find((user) => user.id === userId) ?? null;
+}
+
 export async function updateUser(userId, { name, isInstructor, isAdmin }) {
   unwrap(
     await getSupabase().rpc("admin_update_user", {

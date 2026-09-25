@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import AuthInput from "@/components/auth/AuthInput";
 import AuthButton from "@/components/auth/AuthButton";
 import AuthError from "@/components/auth/AuthError";
 import { updateCourse } from "@/lib/admin/courses";
+import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 
 const FIELD_CLASS = "w-full rounded border border-brown/40 bg-cream px-3 py-2 text-charcoal outline-none";
 
@@ -96,8 +98,13 @@ export default function CourseDetailsForm({ course, users, onSaved }) {
           </select>
         </div>
         <div className="mb-4">
-          <label htmlFor="owner" className="mb-1 block text-sm font-medium">
+          <label htmlFor="owner" className="mb-1 flex items-center justify-between text-sm font-medium">
             Owner
+            {course.ownerId ? (
+              <Link href={GURUKUL_ROUTES.adminUserProfile(course.ownerId)} className="font-normal underline underline-offset-4">
+                View owner&apos;s profile
+              </Link>
+            ) : null}
           </label>
           <select id="owner" value={form.ownerId} onChange={(e) => handleOwnerChange(e.target.value)} className={FIELD_CLASS}>
             <option value="">No owner</option>
