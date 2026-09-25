@@ -115,7 +115,15 @@ export default function AdminCoursesPage() {
                     {course.enrollmentCount} enrolled
                   </p>
                   <p className="text-xs text-charcoal/50">
-                    Owner: {course.ownerName ?? "none"} · id: {course.id}
+                    Owner:{" "}
+                    {course.ownerId ? (
+                      <Link href={GURUKUL_ROUTES.adminUserProfile(course.ownerId)} className="underline underline-offset-4">
+                        {course.ownerName ?? "unknown"}
+                      </Link>
+                    ) : (
+                      "none"
+                    )}{" "}
+                    · id: {course.id}
                   </p>
                 </div>
                 <StatusBadge status={course.status} />

@@ -59,7 +59,10 @@ function UserRow({ user, isSelf, onChanged, onDeleted, onError }) {
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <p className="font-semibold text-charcoal">
-            {user.name} {isSelf ? <span className="text-sm font-normal text-charcoal/60">(you)</span> : null}
+            <Link href={GURUKUL_ROUTES.adminUserProfile(user.id)} className="underline-offset-4 hover:underline">
+              {user.name}
+            </Link>{" "}
+            {isSelf ? <span className="text-sm font-normal text-charcoal/60">(you)</span> : null}
           </p>
           <p className="text-sm text-charcoal/70">{user.email}</p>
           <p className="text-xs text-charcoal/50">
@@ -116,6 +119,9 @@ function UserRow({ user, isSelf, onChanged, onDeleted, onError }) {
             Edit name & roles
           </button>
         ) : null}
+        <Link href={GURUKUL_ROUTES.adminUserProfile(user.id)} className="underline underline-offset-4">
+          View profile
+        </Link>
         <Link
           href={`${GURUKUL_ROUTES.adminEnrollments}?q=${encodeURIComponent(user.email)}`}
           className="underline underline-offset-4"
@@ -160,7 +166,11 @@ export default function AdminUsersPage() {
   const admin = useAdminProfile();
   const [users, setUsers] = useState(null);
   const [filter, setFilter] = useState("all");
-  const [query, setQuery] = useState("");
+  // The profile page links here with ?q=<email>. This page only mounts
+  // client-side (admin/layout.js renders nothing until the admin check).
+  const [query, setQuery] = useState(() =>
+    typeof window === "undefined" ? "" : (new URLSearchParams(window.location.search).get("q") ?? "")
+  );
   const [error, setError] = useState(null);
 
   useEffect(() => {
