@@ -96,6 +96,14 @@ export async function getAllCoursesForAdmin() {
   return rows.map(mapAdminCourse);
 }
 
+// Every course a user uploaded (any status), for the admin profile page.
+export async function getCoursesOwnedBy(userId) {
+  const rows = unwrap(
+    await getSupabase().from("courses").select(ADMIN_COURSE_FIELDS).eq("owner_id", userId).order("title")
+  );
+  return rows.map(mapAdminCourse);
+}
+
 export async function getCourseForAdmin(courseId) {
   const { data, error } = await getSupabase()
     .from("courses")
