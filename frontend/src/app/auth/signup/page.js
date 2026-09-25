@@ -89,13 +89,19 @@ export default function SignupPage() {
     try {
       // Supabase doesn't reveal whether the email already has an account:
       // for an existing address it succeeds but sends no code.
-      const { error } = await getSupabase().auth.signUp({
+      const { data, error } = await getSupabase().auth.signUp({
         email: normalizedEmail,
         password,
         options: { data: { name: name.trim() || "Learner" }, captchaToken },
       });
       if (error) {
         setFormError(error.message);
+        return;
+      }
+      // With "Confirm email" off in Supabase (see SHARING.md) the account is
+      // signed in straight away and no code is sent.
+      if (data.session) {
+        router.push(getPostAuthDestination());
         return;
       }
       setAuthHandoff({ intent: "signup", email: normalizedEmail });
