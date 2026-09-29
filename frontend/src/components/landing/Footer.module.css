@@ -1,6 +1,0 @@
-.texture {
-  background-image:
-    radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--gold) 5%, transparent) 0%, transparent 45%),
-    radial-gradient(circle at 85% 80%, color-mix(in srgb, var(--brown) 6%, transparent) 0%, transparent 50%);
-  pointer-events: none;
-}
