@@ -1,26 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import AuthError from "@/components/auth/AuthError";
+import StatCard from "@/components/gurukul/StatCard";
 import { getAdminStats } from "@/lib/admin/stats";
 import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
-
-function StatCard({ label, value, href, highlight = false }) {
-  const body = (
-    <div className={`surface-earthy h-full rounded-lg p-4 ${highlight ? "ring-2 ring-gold" : ""}`}>
-      <p className="text-sm text-charcoal/70">{label}</p>
-      <p className="mt-1 text-3xl font-semibold text-charcoal">{value}</p>
-    </div>
-  );
-  return href ? (
-    <Link href={href} className="block hover:opacity-90">
-      {body}
-    </Link>
-  ) : (
-    body
-  );
-}
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState(null);
