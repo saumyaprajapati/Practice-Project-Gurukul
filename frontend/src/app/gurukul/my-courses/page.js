@@ -74,6 +74,9 @@ export default function MyCoursesPage() {
                   <Link href={GURUKUL_ROUTES.myCourseAddContent(course.id)} className="underline underline-offset-4">
                     Add Content
                   </Link>
+                  <Link href={GURUKUL_ROUTES.myCourseAnalytics(course.id)} className="underline underline-offset-4">
+                    Course Analytics
+                  </Link>
                   {course.status === "approved" ? (
                     <Link href={GURUKUL_ROUTES.courseDetail(course.id)} className="underline underline-offset-4">
                       View Course

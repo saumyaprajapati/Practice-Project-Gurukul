@@ -105,6 +105,24 @@ where o.bucket_id = 'lesson-media'
   and not exists (select 1 from public.course_lesson_media m where m.storage_path = o.name);
 ```
 
+## Phase 8 — Course analytics (`phase8-course-analytics.sql`)
+
+Run `phase8-course-analytics.sql` after `phase7-lesson-media.sql` (safe to
+re-run). It powers **My Courses → Course Analytics** for instructors:
+
+- `lesson_activity`: one row per learner per course, holding the lesson they
+  last had open and when. The lesson page sends a heartbeat every minute while
+  it's visible (`touch_lesson_activity`). No direct table access.
+- `course_analytics(course_id)`: totals, enrollments per month (last 12, UTC),
+  progress spread, per-lesson drop-off, where unfinished learners stop, and
+  per-module completion.
+- `course_students(course_id)`: the learner list, with name, enrolment date,
+  access, progress, current lesson and last active. Emails are left out on purpose.
+- Only the course owner and admins can call the two read RPCs. The owner's own
+  enrollment (added by `create_course`) is excluded from every number.
+- "Watching now" and "last active" only have data from the moment this phase
+  is live. Enrollment, completion and drop-off numbers use existing data.
+
 ## Making an admin
 
 ```sql
@@ -122,5 +140,7 @@ update public.enrollments set expires_at = now() + interval '10 years';    -- pe
 update public.profiles set is_admin = true;                                -- permission denied (column)
 select public.admin_set_course_status('python-foundations', 'declined');   -- "Admins only."
 select count(*) from public.course_lesson_content;                         -- only previews + enrolled courses
+select public.course_analytics('python-foundations');                      -- "You can only view analytics for your own courses."
+select count(*) from public.lesson_activity;                               -- permission denied
 rollback;
 ```

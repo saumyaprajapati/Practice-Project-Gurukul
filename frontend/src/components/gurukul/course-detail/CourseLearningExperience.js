@@ -1,11 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import SyllabusNav from "./SyllabusNav";
 import LessonPanel from "./LessonPanel";
 import ProgressCard from "./ProgressCard";
 import { flattenLessons } from "@/lib/courses/curriculum";
 import { markLessonComplete } from "@/lib/courses/progress";
+import { touchLessonActivity } from "@/lib/courses/analytics";
+
+const HEARTBEAT_MS = 60_000;
 
 // Enrolled branch. Owns the only interactive/stateful part of the Course
 // Detail page: current lesson + completed-lesson set. initialCompletedLessonIds
@@ -30,6 +33,25 @@ export default function CourseLearningExperience({ curriculum, initialCompletedL
   const totalCount = flatLessons.length;
   const completedCount = completedLessonIds.size;
   const percent = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
+
+  // "Watching now" for the instructor's Course Analytics: a heartbeat every
+  // minute while this lesson is on screen. Failures are ignored — analytics
+  // must never get in the way of learning.
+  const courseId = curriculum.courseId;
+  const activeLessonId = currentLesson?.lessonId;
+  useEffect(() => {
+    if (!activeLessonId) return undefined;
+    function beat() {
+      if (document.visibilityState === "visible") touchLessonActivity(courseId, activeLessonId).catch(() => {});
+    }
+    beat();
+    const interval = setInterval(beat, HEARTBEAT_MS);
+    document.addEventListener("visibilitychange", beat);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", beat);
+    };
+  }, [courseId, activeLessonId]);
 
   async function handleMarkComplete() {
     const { completedLessonIds: updated } = await markLessonComplete(
