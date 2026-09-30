@@ -818,6 +818,48 @@
             },
             "description": "Modules with their lessons, lesson text and media (the same select as lib/courses/courses.js). Locked lessons come back without content. Saves the first module id and first lesson key."
           }
+        },
+        {
+          "name": "Search courses (MCP)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let json = null;",
+                  "try { json = pm.response.json(); } catch (e) {}",
+                  "pm.test('status is 2xx', () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{supabase_url}}/rest/v1/rpc/search_courses",
+              "host": [
+                "{{supabase_url}}"
+              ],
+              "path": [
+                "rest",
+                "v1",
+                "rpc",
+                "search_courses"
+              ]
+            },
+            "description": "What the MCP search_courses tool calls. Full-text search over approved courses and their module/lesson titles; is_enrolled is the caller's own access.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"p_query\": \"docker\",\n  \"p_limit\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
         }
       ]
     },
@@ -1060,6 +1102,48 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"p_course_id\": \"{{course_id}}\",\n  \"p_lesson_key\": \"{{lesson_key}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Search my lessons (MCP recap)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let json = null;",
+                  "try { json = pm.response.json(); } catch (e) {}",
+                  "pm.test('status is 2xx', () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{supabase_url}}/rest/v1/rpc/search_my_lessons",
+              "host": [
+                "{{supabase_url}}"
+              ],
+              "path": [
+                "rest",
+                "v1",
+                "rpc",
+                "search_my_lessons"
+              ]
+            },
+            "description": "What the MCP recap_topic tool calls. Lesson text from courses the caller can open right now (active enrollment or own course), best match first.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"p_query\": \"welcome\",\n  \"p_course_id\": null,\n  \"p_limit\": 5\n}",
               "options": {
                 "raw": {
                   "language": "json"

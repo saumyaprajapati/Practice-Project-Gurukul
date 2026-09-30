@@ -207,6 +207,10 @@ const folders = [
       rest("List approved courses", "GET", `courses?status=eq.approved&select=${COURSE_FIELDS}&order=title`),
       rest("Get one course", "GET", `courses?id=eq.{{course_id}}&select=${COURSE_FIELDS}`),
       getCurriculum,
+      rpc("Search courses (MCP)", "search_courses", { p_query: "docker", p_limit: 10 }, {
+        description:
+          "What the MCP search_courses tool calls. Full-text search over approved courses and their module/lesson titles; is_enrolled is the caller's own access.",
+      }),
     ],
   },
   {
@@ -218,6 +222,10 @@ const folders = [
       rest("My completed lessons", "GET", "lesson_progress?course_id=eq.{{course_id}}&select=lesson_id"),
       markComplete,
       heartbeat,
+      rpc("Search my lessons (MCP recap)", "search_my_lessons", { p_query: "welcome", p_course_id: null, p_limit: 5 }, {
+        description:
+          "What the MCP recap_topic tool calls. Lesson text from courses the caller can open right now (active enrollment or own course), best match first.",
+      }),
     ],
   },
   {

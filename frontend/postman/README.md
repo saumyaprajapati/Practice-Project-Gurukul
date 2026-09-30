@@ -8,7 +8,7 @@ explore and test the backend without the UI:
 |---|---|---|
 | Auth | `/auth/v1/…` | log in (per role), sign up, verify code, resend, recovery, refresh, current user, change password, log out |
 | Database tables | `/rest/v1/<table>` | courses, curriculum, profile, enrollments, lesson progress, deletion requests, lesson media |
-| Database functions (RPC) | `/rest/v1/rpc/<name>` | all 32 public functions in `supabase/*.sql`: checkout, create course, analytics, every admin action… |
+| Database functions (RPC) | `/rest/v1/rpc/<name>` | all 34 public functions in `supabase/*.sql`: checkout, create course, analytics, every admin action… |
 | Storage | `/storage/v1/object/…` | upload, sign, download and delete lesson files |
 
 ## Files
