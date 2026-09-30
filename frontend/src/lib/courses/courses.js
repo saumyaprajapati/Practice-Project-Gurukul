@@ -8,9 +8,8 @@ import { toApiError } from "@/lib/supabase/errors";
 export const COURSE_FIELDS = "id, title, description, category, instructor, thumbnail, price";
 
 // null = doesn't exist OR RLS hides it — same as the old 404.
-// `supabase` defaults to the browser client; the MCP server passes its own.
-export async function getCourseById(id, supabase = getSupabase()) {
-  const { data, error } = await supabase.from("courses").select(COURSE_FIELDS).eq("id", id).maybeSingle();
+export async function getCourseById(id) {
+  const { data, error } = await getSupabase().from("courses").select(COURSE_FIELDS).eq("id", id).maybeSingle();
   if (error) throw toApiError(error);
   return data;
 }
@@ -33,8 +32,8 @@ function mapMedia(row) {
 // share one RLS rule: preview lessons, or enrolled learners/the owner/admins.
 // A lesson whose content row is missing comes back locked, with no content,
 // no video and no files.
-export async function getCourseCurriculum(courseId, supabase = getSupabase()) {
-  const { data, error } = await supabase
+export async function getCourseCurriculum(courseId) {
+  const { data, error } = await getSupabase()
     .from("course_modules")
     .select(
       "id, title, position, course_lessons(id, lesson_key, title, duration_minutes, position, is_preview, course_lesson_content(content), course_lesson_media(id, kind, storage_path, external_url, file_name, mime_type, size_bytes, position))"
