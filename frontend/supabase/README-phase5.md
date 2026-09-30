@@ -123,6 +123,22 @@ re-run). It powers **My Courses → Course Analytics** for instructors:
 - "Watching now" and "last active" only have data from the moment this phase
   is live. Enrollment, completion and drop-off numbers use existing data.
 
+## Phase 9 — MCP server search (`phase9-mcp.sql`)
+
+Run `phase9-mcp.sql` after `phase8-course-analytics.sql` (safe to re-run). It
+adds the two searches behind the AI-agent MCP server (`/api/mcp`, see `MCP.md`):
+
+- `search_courses(query, limit)`: full-text + substring search over approved
+  courses and their module/lesson titles, best match first, with `is_enrolled`
+  for the caller.
+- `search_my_lessons(query, course_id, limit)`: lesson text from courses the
+  caller can open right now (active enrollment or own course). Expired courses
+  and courses they aren't in return nothing.
+- Both are **security invoker**: they run as the signed-in user, so the
+  existing RLS decides what they see. GIN indexes keep lesson search fast.
+- The OAuth server that lets agents sign in is a Dashboard setting, not SQL:
+  see `MCP.md` → "Supabase setup".
+
 ## Making an admin
 
 ```sql
@@ -142,5 +158,6 @@ select public.admin_set_course_status('python-foundations', 'declined');   -- "A
 select count(*) from public.course_lesson_content;                         -- only previews + enrolled courses
 select public.course_analytics('python-foundations');                      -- "You can only view analytics for your own courses."
 select count(*) from public.lesson_activity;                               -- permission denied
+select count(*) from public.search_my_lessons('welcome');                  -- only courses this learner can open
 rollback;
 ```
