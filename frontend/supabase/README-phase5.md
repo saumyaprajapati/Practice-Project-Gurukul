@@ -126,7 +126,8 @@ re-run). It powers **My Courses → Course Analytics** for instructors:
 ## Phase 9 — MCP server search (`phase9-mcp.sql`)
 
 Run `phase9-mcp.sql` after `phase8-course-analytics.sql` (safe to re-run). It
-adds the two searches behind the AI-agent MCP server (`/api/mcp`, see `MCP.md`):
+adds the two searches behind the AI-agent MCP server (the Python server in
+`mcp-server/`, see `mcp-server/README.md`):
 
 - `search_courses(query, limit)`: full-text + substring search over approved
   courses and their module/lesson titles, best match first, with `is_enrolled`
@@ -137,7 +138,7 @@ adds the two searches behind the AI-agent MCP server (`/api/mcp`, see `MCP.md`):
 - Both are **security invoker**: they run as the signed-in user, so the
   existing RLS decides what they see. GIN indexes keep lesson search fast.
 - The OAuth server that lets agents sign in is a Dashboard setting, not SQL:
-  see `MCP.md` → "Supabase setup".
+  see `mcp-server/README.md` → "Supabase setup".
 
 ## Making an admin
 

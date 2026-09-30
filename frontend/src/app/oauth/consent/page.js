@@ -11,7 +11,8 @@ import { getSession, logout } from "@/lib/auth/session";
 import { getSupabase } from "@/lib/supabase/client";
 
 // OAuth consent screen for AI agents connecting to the Gurukul MCP server
-// (/api/mcp). Supabase Auth's OAuth server sends the browser here with an
+// (the separate Python server in mcp-server/). Supabase Auth's OAuth server
+// sends the browser here with an
 // authorization_id (Dashboard → Authentication → OAuth Server → authorization
 // path). Signed-out users log in or sign up first and come back here.
 
