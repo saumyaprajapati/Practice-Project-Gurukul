@@ -1,29 +1,42 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getCourseById } from "@/lib/courses/courses";
 import { checkoutCourse } from "@/lib/courses/enrollment";
 import { formatPrice } from "@/lib/courses/currency";
 import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
+import CourseNotFound from "@/components/gurukul/CourseNotFound";
 
 // A deliberately minimal checkout: an order summary and a single confirm
 // button — no fake card-number fields, so this never resembles a real
 // payment form. Confirming calls the checkout() RPC, which writes an
 // active enrollment row, then redirects to My Learning, where the
 // course now actually appears. No real payment is ever processed anywhere.
-export default function CheckoutPage({ params }) {
-  const { courseId } = use(params);
+// The course id comes from ?id= (static export, see lib/gurukul/routes.js);
+// useSearchParams needs a Suspense boundary in a static build.
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={null}>
+      <Checkout />
+    </Suspense>
+  );
+}
+
+function Checkout() {
+  const courseId = useSearchParams().get("id") ?? "";
   const router = useRouter();
-  const [course, setCourse] = useState(null);
+  const [course, setCourse] = useState(undefined);
   const [isConfirming, setIsConfirming] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    getCourseById(courseId).then((fetchedCourse) => {
-      if (!cancelled) setCourse(fetchedCourse);
-    });
+    getCourseById(courseId)
+      .catch(() => null)
+      .then((fetchedCourse) => {
+        if (!cancelled) setCourse(fetchedCourse);
+      });
     return () => {
       cancelled = true;
     };
@@ -35,7 +48,8 @@ export default function CheckoutPage({ params }) {
     router.push(GURUKUL_ROUTES.learning);
   }
 
-  if (!course) return null;
+  if (course === undefined) return null;
+  if (!course) return <CourseNotFound />;
 
   return (
     <section className="section-manuscript flex-1">

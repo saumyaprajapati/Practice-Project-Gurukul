@@ -1,7 +1,7 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import AuthInput from "@/components/auth/AuthInput";
 import AuthButton from "@/components/auth/AuthButton";
 import AuthError from "@/components/auth/AuthError";
@@ -12,17 +12,25 @@ import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 
 const EMPTY_LESSON = () => ({ title: "", content: "", durationMinutes: 10, isPreview: false });
 
-export default function AddContentPage({ params }) {
-  const { courseId } = use(params);
+// The course id comes from ?id= (static export, see lib/gurukul/routes.js);
+// useSearchParams needs a Suspense boundary in a static build.
+export default function AddContentPage() {
+  return (
+    <Suspense fallback={null}>
+      <AddContent />
+    </Suspense>
+  );
+}
+
+function AddContent() {
+  const searchParams = useSearchParams();
+  const courseId = searchParams.get("id") ?? "";
   const router = useRouter();
   const [curriculum, setCurriculum] = useState(null);
   const [error, setError] = useState(null);
   const [openMediaLessonId, setOpenMediaLessonId] = useState(null);
-  // Set by create-course's redirect. Only rendered client-side (behind the
-  // Hub's auth guard), so reading the URL directly is safe.
-  const [justCreated] = useState(
-    () => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("created")
-  );
+  // Set by create-course's redirect (&created=1).
+  const [justCreated] = useState(() => searchParams.has("created"));
 
   const [newModuleTitle, setNewModuleTitle] = useState("");
   const [newModuleLessons, setNewModuleLessons] = useState([EMPTY_LESSON()]);

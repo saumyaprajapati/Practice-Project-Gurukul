@@ -1,7 +1,8 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import AuthError from "@/components/auth/AuthError";
 import StatusBadge from "@/components/admin/StatusBadge";
 import ProfileCoursesSection from "@/components/admin/ProfileCoursesSection";
@@ -19,8 +20,18 @@ function formatDate(value) {
 // Admin-only view of one user: who they are, the courses they uploaded
 // (All / Approved / Pending approval) and the courses they're enrolled in.
 // Guard + tabs: admin/layout.js.
-export default function AdminUserProfilePage({ params }) {
-  const { userId } = use(params);
+// The user id comes from ?id= (static export, see lib/gurukul/routes.js);
+// useSearchParams needs a Suspense boundary in a static build.
+export default function AdminUserProfilePage() {
+  return (
+    <Suspense fallback={null}>
+      <AdminUserProfile />
+    </Suspense>
+  );
+}
+
+function AdminUserProfile() {
+  const userId = useSearchParams().get("id") ?? "";
   const admin = useAdminProfile();
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);

@@ -103,7 +103,7 @@ export default function CreateCoursePage() {
       });
       // Lessons only exist once the course is created, so videos and files
       // are attached next, on the course's add-content page.
-      router.push(`${GURUKUL_ROUTES.myCourseAddContent(courseId)}?created=1`);
+      router.push(`${GURUKUL_ROUTES.myCourseAddContent(courseId)}&created=1`);
     } catch (err) {
       setError(err.message);
       setIsSubmitting(false);

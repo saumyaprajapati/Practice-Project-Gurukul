@@ -1,7 +1,8 @@
 "use client";
 
-import { use, useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import AuthError from "@/components/auth/AuthError";
 import StatusBadge from "@/components/admin/StatusBadge";
 import OverviewTab from "@/components/gurukul/analytics/OverviewTab";
@@ -18,12 +19,21 @@ const REFRESH_MS = 60_000;
 
 // Instructor analytics for one of their own courses (admins can open any).
 // Ownership is checked by the course_analytics / course_students RPCs.
-export default function CourseAnalyticsPage({ params }) {
-  const { courseId } = use(params);
-  // Only rendered client-side (behind the Hub's auth guard), so reading the
-  // URL directly is safe — same as add-content's ?created flag.
+// The course id comes from ?id= (static export, see lib/gurukul/routes.js);
+// useSearchParams needs a Suspense boundary in a static build.
+export default function CourseAnalyticsPage() {
+  return (
+    <Suspense fallback={null}>
+      <CourseAnalytics />
+    </Suspense>
+  );
+}
+
+function CourseAnalytics() {
+  const searchParams = useSearchParams();
+  const courseId = searchParams.get("id") ?? "";
   const [tab, setTab] = useState(() => {
-    const requested = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tab") : null;
+    const requested = searchParams.get("tab");
     return TABS.some((item) => item.value === requested) ? requested : "overview";
   });
   const [data, setData] = useState(null);
@@ -67,7 +77,10 @@ export default function CourseAnalyticsPage({ params }) {
 
   function handleTabChange(value) {
     setTab(value);
-    window.history.replaceState(null, "", `?tab=${value}`);
+    // Keep ?id= — only swap the tab.
+    const params = new URLSearchParams(window.location.search);
+    params.set("tab", value);
+    window.history.replaceState(null, "", `?${params}`);
   }
 
   const backLink = (

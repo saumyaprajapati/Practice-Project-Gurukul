@@ -1,8 +1,8 @@
 "use client";
 
-import { use, useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import AuthError from "@/components/auth/AuthError";
 import ConfirmButton from "@/components/admin/ConfirmButton";
 import StatusBadge from "@/components/admin/StatusBadge";
@@ -15,8 +15,18 @@ import { GURUKUL_ROUTES } from "@/lib/gurukul/routes";
 
 // Admin editor for any course: details (incl. owner transfer and status),
 // full curriculum control, and instant deletion. Guard + tabs: admin/layout.js.
-export default function AdminCourseEditPage({ params }) {
-  const { courseId } = use(params);
+// The course id comes from ?id= (static export, see lib/gurukul/routes.js);
+// useSearchParams needs a Suspense boundary in a static build.
+export default function AdminCourseEditPage() {
+  return (
+    <Suspense fallback={null}>
+      <AdminCourseEdit />
+    </Suspense>
+  );
+}
+
+function AdminCourseEdit() {
+  const courseId = useSearchParams().get("id") ?? "";
   const router = useRouter();
   const [course, setCourse] = useState(null);
   const [curriculum, setCurriculum] = useState(null);
